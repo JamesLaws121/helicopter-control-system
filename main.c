@@ -7,7 +7,6 @@
 
 
 
-
 #include <stdbool.h>
 #include <stdint.h>
 #include "inc/hw_memmap.h"
@@ -22,12 +21,8 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-#include "HeightController.h"
-
-
-//static void BlinkLED(void *);
-
-
+#include "heightController.h"
+#include "buttonTask.h"
 
 
 
@@ -41,15 +36,54 @@ int main(void)
      SYSCTL_XTAL_16MHZ);
 
 
-    initHeightController();
+    /*
+    * Create the heightController task
+    */
+    if(heightControllerInit() != 0)
+    {
+        // Error while creating task
+        while(1)
+        {
+        }
+    }
+
+    /*
+    * Create the button task
+    */
+    if(buttonTaskInit() != 0)
+    {
+        // Error while creating task
+        while(1)
+        {
+        }
+    }
+
+    /*
+    * Create the altitude task
+    */
+    if(altitudeTaskInit() != 0)
+    {
+        // Error while creating task
+        while(1)
+        {
+        }
+    }
+
+    /*
+    * Create the heightOuput task
+    */
+    if(heightOuputTaskInit() != 0)
+    {
+        // Error while creating task
+        while(1)
+        {
+        }
+    }
 
     vTaskStartScheduler(); // Start FreeRTOS!!
 
-    // Should never get here since the RTOS should never "exit".
     while(1);
 }
-
-
 
 
 
