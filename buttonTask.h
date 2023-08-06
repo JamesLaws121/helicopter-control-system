@@ -11,4 +11,9 @@
 */
 extern uint32_t buttonTaskInit(void);
 
+/**
+* Gets the button input queue
+**/
+extern xQueueHandle getButtonInputQueue();
+
 #endif // BUTTTONTASK_H_
