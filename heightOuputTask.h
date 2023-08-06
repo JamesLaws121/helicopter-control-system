@@ -9,7 +9,15 @@
 #define HEIGHTOUTPUT_H_
 
 
+/**
+* Initializes the height output task
+**/
 void heightOutputInit (void);
+
+/**
+* Gets the heightOuput queue
+**/
+extern xQueueHandle heightOuputQueue();
 
 
 #endif /* HEIGHTOUTPUT_H_ */

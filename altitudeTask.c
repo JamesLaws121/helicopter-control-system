@@ -13,6 +13,27 @@
 
 
 /**
+*The item size and queue size for the altitude input queue.
+**/
+#define ALTITUDE_INPUT_ITEM_SIZE           sizeof(uint8_t)
+#define ALTITUDE_INPUT_QUEUE_SIZE          5
+
+
+/**
+* The queue that holds button inputs
+**/
+xQueueHandle altitudeInputQueue;
+
+
+/**
+* Gets the altitude input queue
+**/
+xQueueHandle getAltiduteInputQueue() {
+   return altitudInputQueue;
+}
+
+
+/**
 * This task reads the altitude and puts this information in the altitudenputQueue
 **/
 static void altitudeTask(void *pvParameters) {
@@ -44,8 +65,9 @@ uint32_t altitudeTaskInit(void)
         return(1); // error creating task, out of memory?
     }
 
-    //
+    // Create a queue for storing altitude inputs
+    altitudeInputQueue = xQueueCreate(ALTITUDE_INPUT_QUEUE_SIZE, ALTITUDE_INPUT_ITEM_SIZE);
+
     // Success.
-    //
     return(0);
 }

@@ -9,6 +9,10 @@
 #include <stdio.h>
 #include <task.h>
 
+#include "buttonTask.h"
+#include "altitudeTask.h"
+#include "heightOuput.h"
+
 
 /**
 * The stack size for the buttons task
@@ -17,23 +21,56 @@
 
 
 /**
+* This is the current height set by the user
+**/
+static helicopterHeight = 0;
+
+
+
+/**
 * This task monitors and alters the helicopters height
 **/
 static void heightControllerTask(void *pvParameters) {
 
+    uint8_t buttonInputMessage;
+
+    uint8_t altitudeInputMessage;
+
+    uint8_t heightOuputMessage;
+
     while(1)
     {
+        xQueueHandle altitudeInputQueue = getAltiduteInputQueue();
 
-        // Read altitude data
+        xQueueHandle buttonInputQueue = getButtonInputQueue();
 
-        // Compare with wanted altitude
 
-        // Calculate rotar output to get to wanted altitude
+        // Read the next button input, if available on queue.
+        if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
+            // Update height based on button buttonInput
+            helicopterHeight = buttonInputMessage;
+        }
 
-        // Write to ouput queue
 
-        // Runs every 500 millisecond
-        vTaskDelay(pdMS_TO_TICKS(500));
+        // Reads the altitude input and updates output accordingly
+        if (xQueueReceive(altitudeInputQueue, &altitudeInputMessage, 0) == pdPASS) {
+            // Calculate rotar output to get to wanted altitude
+            heightOuputMessage = 1;
+
+            xQueueHandle heightOutputQueue = getHeightOutputQueue();
+            // Write to ouput queue
+            if(xQueueSend(heightOutputQueue, &heightOuputMessage , portMAX_DELAY) != pdPASS) {
+                // Error. The queue should never be full.
+                UARTprintf("\nQueue full. This should never happen.\n");
+                while(1)
+                {
+                }
+            }
+        }
+
+
+
+        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_HEIGHT_CONTROLLER_TASK));
     }
 }
 

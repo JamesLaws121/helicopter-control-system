@@ -11,4 +11,9 @@
 */
 extern uint32_t altitudeTaskInit(void);
 
+/**
+* Gets the altidute input queue
+**/
+extern xQueueHandle getAltidutenInputQueue();
+
 #endif // ALTITUDETASK_H_

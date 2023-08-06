@@ -11,9 +11,28 @@
 **/
 #define HEIGHTOUPUTSTASKSTACKSIZE    32         // Stack size in words
 
+/**
+*The item size and queue size for the height ouput queue.
+**/
+#define HEIGHT_OUTPUT_ITEM_SIZE           sizeof(uint8_t)
+#define HEIGHT_OUTPUT_QUEUE_SIZE          5
+
 
 /**
-* This task reads the buttons' state and puts this information in the buttonInputQueue
+* The queue that holds button inputs
+**/
+xQueueHandle heightOutputQueue;
+
+/**
+* Gets the heightOuput queue
+**/
+xQueueHandle getheightOuputQueue() {
+   return heightOuputQueue;
+}
+
+
+/**
+* This task reads the heightOuputQueue and outputs the desired output
 **/
 static void heightOuputTask(void *pvParameters) {
 
@@ -43,8 +62,9 @@ uint32_t heightOuputTaskInit(void)
         return(1); // error creating task, out of memory?
     }
 
-    //
+    // Create a queue for storing height
+    altitudeInputQueue = xQueueCreate(ALTITUDE_INPUT_QUEUE_SIZE, ALTITUDE_INPUT_ITEM_SIZE);
+
     // Success.
-    //
     return(0);
 }
