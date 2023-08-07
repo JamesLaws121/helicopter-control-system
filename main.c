@@ -31,6 +31,12 @@
 
 
 /**
+ * The mutex that protects concurrent access of UART from multiple tasks.
+ */
+SemaphoreHandle_t g_pUARTSemaphore;
+
+
+/**
  * This hook is called by FreeRTOS when an stack overflow error is detected.
  */
 void vApplicationStackOverflowHook(TaskHandle_t *pxTask, char *pcTaskName)
@@ -94,6 +100,11 @@ int main(void)
 
 
     UARTprintf("\n\nWelcome to project");
+
+
+    // Create a mutex to guard the UART.
+    g_pUARTSemaphore = xSemaphoreCreateMutex();
+
 
     /*
     * Create the button task

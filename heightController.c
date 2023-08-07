@@ -30,6 +30,8 @@
 #define HEIGHT_TASK_STACK_SIZE    32         // Stack size in words
 
 
+extern SemaphoreHandle_t g_pUARTSemaphore;
+
 /**
 * This task monitors and alters the helicopters height
 **/
@@ -47,9 +49,15 @@ static void heightControllerTask(void *pvParameters) {
 
     while(1)
     {
-        UARTprintf("\n\nHeight Controller Task");
-        QueueHandle_t altitudeInputQueue = getAltitudeInputQueue();
+        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_HEIGHT_CONTROLLER_TASK));
 
+
+        xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
+        UARTprintf("\n\nHeight Controller Task");
+        xSemaphoreGive(g_pUARTSemaphore);
+
+
+        QueueHandle_t altitudeInputQueue = getAltitudeInputQueue();
         QueueHandle_t buttonInputQueue = getButtonInputQueue();
 
 
@@ -57,7 +65,7 @@ static void heightControllerTask(void *pvParameters) {
         if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
             // Update height based on button buttonInput
             helicopterHeight = buttonInputMessage;
-            UARTprintf("\n\nHeight" + helicopterHeight);
+            UARTprintf("\n\nHeight: %d", helicopterHeight);
         }
 
 
@@ -70,16 +78,12 @@ static void heightControllerTask(void *pvParameters) {
             // Write to output queue
             if(xQueueSend(heightOutputQueue, &heightOuputMessage , portMAX_DELAY) != pdPASS) {
                 // Error. The queue should never be full.
-                //UARTprintf("\nQueue full. This should never happen.\n");
+                UARTprintf("\nQueue full. This should never happen.\n");
                 while(1)
                 {
                 }
             }
         }
-
-
-
-        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_HEIGHT_CONTROLLER_TASK));
     }
 }
 

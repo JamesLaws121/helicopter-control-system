@@ -46,6 +46,8 @@ QueueHandle_t getHeightOutputQueue() {
 }
 
 
+extern SemaphoreHandle_t g_pUARTSemaphore;
+
 /**
 * This task reads the heightOuputQueue and outputs the desired output
 **/
@@ -53,12 +55,14 @@ static void heightOuputTask(void *pvParameters) {
 
     while(1)
     {
+        vTaskDelay(pdMS_TO_TICKS(FREQUENCYY_HEIGHT_OUTPUT_TASK));
         /*
         *   HEIGHT output READING CODE HERE
         */
-        UARTprintf("\n\n Height Output Task");
 
-        vTaskDelay(pdMS_TO_TICKS(FREQUENCYY_HEIGHT_OUTPUT_TASK));
+        xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
+        UARTprintf("\n\n Height Output Task");
+        xSemaphoreGive(g_pUARTSemaphore);
     }
 }
 

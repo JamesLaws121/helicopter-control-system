@@ -39,6 +39,9 @@
 QueueHandle_t buttonInputQueue;
 
 
+extern SemaphoreHandle_t g_pUARTSemaphore;
+
+
 /**
 * Gets the button input queue
 **/
@@ -53,12 +56,13 @@ static void buttonTask(void *pvParameters) {
 
     while(1)
     {
+        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_BUTTON_TASK));
         /*
         *   BUTTON READING CODE HERE
         */
+        xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
         UARTprintf("\n\n Button Input Task");
-
-        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_BUTTON_TASK));
+        xSemaphoreGive(g_pUARTSemaphore);
     }
 }
 

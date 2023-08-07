@@ -48,6 +48,8 @@ QueueHandle_t getAltitudeInputQueue() {
 }
 
 
+extern SemaphoreHandle_t g_pUARTSemaphore;
+
 /**
 * This task reads the altitude and puts this information in the altitudenputQueue
 **/
@@ -55,12 +57,14 @@ static void altitudeTask(void *pvParameters) {
 
     while(1)
     {
+        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_ALTITUDE_TASK));
         /*
         *   altitude READING CODE HERE
         */
 
+        xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
         UARTprintf("\n\n Altitude Input Task");
-        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_ALTITUDE_TASK));
+        xSemaphoreGive(g_pUARTSemaphore);
     }
 }
 
