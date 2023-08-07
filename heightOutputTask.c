@@ -46,8 +46,6 @@ QueueHandle_t getHeightOutputQueue() {
 }
 
 
-extern SemaphoreHandle_t g_pUARTSemaphore;
-
 /**
 * This task reads the heightOuputQueue and outputs the desired output
 **/

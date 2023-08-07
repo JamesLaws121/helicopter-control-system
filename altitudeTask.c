@@ -48,8 +48,6 @@ QueueHandle_t getAltitudeInputQueue() {
 }
 
 
-extern SemaphoreHandle_t g_pUARTSemaphore;
-
 /**
 * This task reads the altitude and puts this information in the altitudenputQueue
 **/

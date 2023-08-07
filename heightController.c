@@ -30,8 +30,6 @@
 #define HEIGHT_TASK_STACK_SIZE    32         // Stack size in words
 
 
-extern SemaphoreHandle_t g_pUARTSemaphore;
-
 /**
 * This task monitors and alters the helicopters height
 **/

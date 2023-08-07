@@ -39,7 +39,7 @@
 QueueHandle_t buttonInputQueue;
 
 
-extern SemaphoreHandle_t g_pUARTSemaphore;
+
 
 
 /**

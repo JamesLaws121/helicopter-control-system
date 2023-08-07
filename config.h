@@ -3,6 +3,9 @@
 * config.h - config for the various FreeRTOS tasks.
 */
 
+#include "FreeRTOS.h"
+#include "semphr.h"
+
 
 #ifndef CONFIG_H_
 #define CONFIG_H_
@@ -21,6 +24,9 @@
 #define FREQUENCY_HEIGHT_CONTROLLER_TASK    6000
 #define FREQUENCY_ALTITUDE_TASK             7000
 #define FREQUENCYY_HEIGHT_OUTPUT_TASK       8000
+
+// The UART semaphore
+extern SemaphoreHandle_t g_pUARTSemaphore;
 
 
 #endif /* CONFIG_H_ */
