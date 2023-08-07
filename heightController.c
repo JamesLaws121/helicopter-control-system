@@ -64,6 +64,7 @@ static void heightControllerTask(void *pvParameters) {
         // Read the next button input, if available on queue.
         if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
             // Update height based on button buttonInput
+            UARTprintf("\n READ FROM BUTTON QUEUE\n");
             helicopterHeight = buttonInputMessage;
             UARTprintf("\n\nHeight: %d", helicopterHeight);
         }
@@ -73,6 +74,7 @@ static void heightControllerTask(void *pvParameters) {
         if (xQueueReceive(altitudeInputQueue, &altitudeInputMessage, 0) == pdPASS) {
             // Calculate roter output to get to wanted altitude
             heightOuputMessage = 1;
+            UARTprintf("\n READ FROM ALTITUDE QUEUE\n");
 
             QueueHandle_t heightOutputQueue = getHeightOutputQueue();
             // Write to output queue
