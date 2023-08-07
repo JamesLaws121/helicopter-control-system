@@ -6,6 +6,19 @@
  */
 
 
+#include <stdbool.h>
+#include <stdint.h>
+#include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
+#include "driverlib/gpio.h"
+#include "driverlib/rom.h"
+#include "drivers/buttons.h"
+#include "utils/uartstdio.h"
+#include "config.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
 
  /**
  *The item size and queue size for the button input queue.
@@ -16,20 +29,20 @@
 /**
 * The stack size for the buttons task
 **/
-#define BUTTONSTASKSTACKSIZE    32         // Stack size in words
+#define BUTTON_TASK_STACK_SIZE    32         // Stack size in words
 
 
 
 /**
 * The queue that holds button inputs
 **/
-xQueueHandle buttonInputQueue;
+QueueHandle_t buttonInputQueue;
 
 
 /**
 * Gets the button input queue
 **/
-xQueueHandle getButtonInputQueue() {
+QueueHandle_t getButtonInputQueue() {
     return buttonInputQueue;
 }
 
@@ -44,7 +57,7 @@ static void buttonTask(void *pvParameters) {
         *   BUTTON READING CODE HERE
         */
 
-        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_BUTTONS_TASK));
+        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_BUTTON_TASK));
     }
 }
 
@@ -63,8 +76,8 @@ uint32_t buttonTaskInit(void)
     /*
     * Create the buttons task.
     */
-    if(pdTRUE != xTaskCreate(buttonTask, "buttonTask", BUTTONSTASKSTACKSIZE, NULL, tskIDLE_PRIORITY +
-                   PRIORITY_SWITCH_TASK, NULL))
+    if(pdTRUE != xTaskCreate(buttonTask, "buttonTask", BUTTON_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY +
+                             PRIORITY_BUTTON_TASK, NULL))
     {
         return(1); // error creating task, out of memory?
     }

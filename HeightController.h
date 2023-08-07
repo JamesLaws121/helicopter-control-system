@@ -9,7 +9,7 @@
 #define HEIGHTCONTROLLER_H_
 
 
-void heightControllerInit (void);
+extern uint32_t heightControllerInit (void);
 
 
 #endif /* HEIGHTCONTROLLER_H_ */

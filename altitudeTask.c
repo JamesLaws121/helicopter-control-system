@@ -6,6 +6,21 @@
  */
 
 
+#include <stdbool.h>
+#include <stdint.h>
+#include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
+#include "driverlib/gpio.h"
+#include "driverlib/rom.h"
+#include "drivers/buttons.h"
+#include "utils/uartstdio.h"
+#include "config.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+
+
 /**
 * The stack size for the buttons task
 **/
@@ -22,14 +37,14 @@
 /**
 * The queue that holds button inputs
 **/
-xQueueHandle altitudeInputQueue;
+QueueHandle_t altitudeInputQueue;
 
 
 /**
 * Gets the altitude input queue
 **/
-xQueueHandle getAltiduteInputQueue() {
-   return altitudInputQueue;
+QueueHandle_t getAltitudeInputQueue() {
+   return altitudeInputQueue;
 }
 
 
@@ -53,14 +68,14 @@ static void altitudeTask(void *pvParameters) {
 /**
 * Initializes the altitude task
 **/
-uint32_t altitudeTaskInit(void)
+uint8_t altitudeTaskInit(void)
 {
 
     /*
     * Create the altitude task.
     */
-    if(pdTRUE !=  xTaskCreate(buttonTask, "altitudeTask", BUTTONSTASKSTACKSIZE, NULL, tskIDLE_PRIORITY +
-                   PRIORITY_SWITCH_TASK, NULL))
+    if(pdTRUE !=  xTaskCreate(altitudeTask, "altitudeTask", ALTITUDESTASKSTACKSIZE, NULL, tskIDLE_PRIORITY +
+                              PRIORITY_ALTITUDE_TASK, NULL))
     {
         return(1); // error creating task, out of memory?
     }

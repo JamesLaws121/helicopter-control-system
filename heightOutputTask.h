@@ -12,12 +12,12 @@
 /**
 * Initializes the height output task
 **/
-void heightOutputInit (void);
+extern uint32_t heightOuputTaskInit (void);
 
 /**
 * Gets the heightOuput queue
 **/
-extern xQueueHandle heightOuputQueue();
+extern QueueHandle_t getHeightOutputQueue();
 
 
 #endif /* HEIGHTOUTPUT_H_ */
