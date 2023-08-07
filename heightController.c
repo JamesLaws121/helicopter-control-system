@@ -31,16 +31,13 @@
 
 
 /**
-* This is the current height set by the user
-**/
-static helicopterHeight = 0;
-
-
-
-/**
 * This task monitors and alters the helicopters height
 **/
 static void heightControllerTask(void *pvParameters) {
+    /**
+    * This is the current height set by the user
+    **/
+    int helicopterHeight = 0;
 
     uint8_t buttonInputMessage;
 
@@ -50,6 +47,7 @@ static void heightControllerTask(void *pvParameters) {
 
     while(1)
     {
+        UARTprintf("\n\nHeight Controller Task");
         QueueHandle_t altitudeInputQueue = getAltitudeInputQueue();
 
         QueueHandle_t buttonInputQueue = getButtonInputQueue();
@@ -59,6 +57,7 @@ static void heightControllerTask(void *pvParameters) {
         if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
             // Update height based on button buttonInput
             helicopterHeight = buttonInputMessage;
+            UARTprintf("\n\nHeight" + helicopterHeight);
         }
 
 

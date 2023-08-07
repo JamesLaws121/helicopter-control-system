@@ -59,8 +59,8 @@ static void altitudeTask(void *pvParameters) {
         *   altitude READING CODE HERE
         */
 
-        // Runs every 500 millisecond
-        vTaskDelay(pdMS_TO_TICKS(500));
+        UARTprintf("\n\n Altitude Input Task");
+        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_ALTITUDE_TASK));
     }
 }
 

@@ -56,6 +56,7 @@ static void heightOuputTask(void *pvParameters) {
         /*
         *   HEIGHT output READING CODE HERE
         */
+        UARTprintf("\n\n Height Output Task");
 
         vTaskDelay(pdMS_TO_TICKS(FREQUENCYY_HEIGHT_OUTPUT_TASK));
     }

@@ -7,6 +7,7 @@
 
 
 
+
 #include <stdbool.h>
 #include <stdint.h>
 #include "inc/hw_memmap.h"
@@ -22,10 +23,10 @@
 #include "queue.h"
 #include "semphr.h"
 
-#include "heightController.h"
 #include "buttonTask.h"
 #include "heightOutputTask.h"
 #include "altitudeTask.h"
+#include "heightController.h"
 
 
 

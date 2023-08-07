@@ -5,6 +5,8 @@
  *      Author: James Laws
  */
 
+#include "stdint.h"
+
 #ifndef HEIGHTCONTROLLER_H_
 #define HEIGHTCONTROLLER_H_
 

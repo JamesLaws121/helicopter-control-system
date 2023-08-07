@@ -56,6 +56,7 @@ static void buttonTask(void *pvParameters) {
         /*
         *   BUTTON READING CODE HERE
         */
+        UARTprintf("\n\n Button Input Task");
 
         vTaskDelay(pdMS_TO_TICKS(FREQUENCY_BUTTON_TASK));
     }
