@@ -28,6 +28,9 @@
 #include "altitudeTask.h"
 #include "heightController.h"
 
+#include "OrbitOLED/OrbitOLEDInterface.h"
+#include "display.h"
+
 
 
 /**
@@ -97,6 +100,10 @@ int main(void)
 
     // Initialize the UART and configure it for 115,200, 8-N-1 operation.
     ConfigureUART();
+
+    OLEDInitialise();
+    updateDisplay();
+
 
 
     UARTprintf("\n\nWelcome to project");
