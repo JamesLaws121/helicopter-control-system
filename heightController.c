@@ -77,8 +77,7 @@ static void heightControllerTask(void *pvParameters) {
             QueueHandle_t heightOutputQueue = getHeightOutputQueue();
             // Write to output queue
             if(xQueueSend(heightOutputQueue, &heightOuputMessage , portMAX_DELAY) != pdPASS) {
-                // Error. The queue should never be full.
-                UARTprintf("\nQueue full. This should never happen.\n");
+                UARTprintf("\nERROR: Queue full. This should never happen.\n");
                 while(1)
                 {
                 }
