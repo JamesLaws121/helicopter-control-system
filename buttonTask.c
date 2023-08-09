@@ -60,9 +60,9 @@ static void buttonTask(void *pvParameters) {
         /*
         *   BUTTON READING CODE HERE
         */
-        xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
+        xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
         UARTprintf("\n\n Button Input Task");
-        xSemaphoreGive(g_pUARTSemaphore);
+        xSemaphoreGive(UARTSemaphore);
     }
 }
 

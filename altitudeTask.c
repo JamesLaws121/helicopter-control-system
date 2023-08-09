@@ -11,6 +11,8 @@
 #include "inc/hw_types.h"
 #include "driverlib/gpio.h"
 #include "driverlib/rom.h"
+#include "driverlib/adc.h"
+
 #include "drivers/buttons.h"
 #include "utils/uartstdio.h"
 #include "config.h"
@@ -35,7 +37,7 @@
 /**
 *The item size and queue size for the altitude input queue.
 **/
-#define ALTITUDE_INPUT_ITEM_SIZE           sizeof(uint8_t)
+#define ALTITUDE_INPUT_ITEM_SIZE           sizeof(uint16_t)
 #define ALTITUDE_INPUT_QUEUE_SIZE          5
 
 
@@ -66,9 +68,9 @@ static void altitudeTask(void *pvParameters) {
         vTaskDelay(pdMS_TO_TICKS(FREQUENCY_ALTITUDE_TASK));
 
 
-        xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
+        xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
         UARTprintf("\n\n Altitude Input Task");
-        xSemaphoreGive(g_pUARTSemaphore);
+        xSemaphoreGive(UARTSemaphore);
 
 
         // Trigger the collection of altitude data
@@ -80,12 +82,12 @@ static void altitudeTask(void *pvParameters) {
             sampleCount = 0;
             uint16_t sampleAverage = getBufferMean();
             
-            if(xQueueSend(altitudeInputQueue, &sampleAverage , portMAX_DELAY) != pdPASS) {
+            if(xQueueSend(altitudeInputQueue, &sampleAverage , 0) != pdPASS) {
                 UARTprintf("\nERROR: Queue full. This should never happen.\n");
-                while(1)
-                {
-                }
             }
+            uint16_t ulValReceived = 0;
+            xQueuePeek( altitudeInputQueue, &ulValReceived, 0 );
+            UARTprintf("\n\nItem sent %d", ulValReceived);
         }
         
     }

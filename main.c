@@ -31,9 +31,9 @@
 
 
 /**
- * The mutex that protects concurrent access of UART from multiple tasks.
+ * The semaphore that protects concurrent access of UART from multiple tasks.
  */
-SemaphoreHandle_t g_pUARTSemaphore;
+SemaphoreHandle_t UARTSemaphore;
 
 
 /**
@@ -102,8 +102,12 @@ int main(void)
     UARTprintf("\n\nWelcome to project");
 
 
-    // Create a mutex to guard the UART.
-    g_pUARTSemaphore = xSemaphoreCreateMutex();
+    // Create a binary semaphore to guard the UART.
+    UARTSemaphore = xSemaphoreCreateBinary();
+    while ( UARTSemaphore == NULL ) {
+
+    }
+    xSemaphoreGive(UARTSemaphore);
 
 
     /*

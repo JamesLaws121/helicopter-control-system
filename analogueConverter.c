@@ -15,7 +15,7 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/debug.h"
 #include "utils/ustdlib.h"
-#include "circBufT.h"
+#include "types/circBufT.h"
 
 // Buffer size
 #define BUF_SIZE 10
@@ -35,7 +35,7 @@ void ADCIntHandler(void)
 	ADCSequenceDataGet(ADC0_BASE, 3, &ulValue);
 
 	// Place it in the circular buffer (advancing write index)
-	writeCircBuf (&g_adcBuffer, ulValue);
+	writeCircBuf (&adcBuffer, ulValue);
 
     // Clean up, clearing the interrupt
     ADCIntClear(ADC0_BASE, 3);
@@ -47,6 +47,8 @@ void ADCIntHandler(void)
 */
 void initADC(void)
 {
+    // initialize the altitude circular buffer
+    initCircBuf(&adcBuffer, BUF_SIZE);
 
     // The ADC0 peripheral must be enabled for configuration and use.
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
@@ -78,8 +80,9 @@ void initADC(void)
 * Calculates and return the rounded mean of the buffer contents
 */
 uint16_t getBufferMean(){
-    uint16_t sum = 0;
-    for (uint8_t i = 0; i < BUF_SIZE; i++)
+    uint32_t sum = 0;
+    uint8_t i;
+    for (i = 0; i < BUF_SIZE; i++)
         sum = sum + readCircBuf(&adcBuffer);
         
 
