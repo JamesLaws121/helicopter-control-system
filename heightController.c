@@ -13,12 +13,12 @@
 #include "driverlib/rom.h"
 #include "drivers/buttons.h"
 #include "utils/uartstdio.h"
-#include "config.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
 
+#include "config.h"
 #include "buttonTask.h"
 #include "heightOutputTask.h"
 #include "altitudeTask.h"
@@ -41,7 +41,7 @@ static void heightControllerTask(void *pvParameters) {
 
     uint8_t buttonInputMessage;
 
-    uint8_t altitudeInputMessage;
+    uint16_t altitudeInputMessage;
 
     uint8_t heightOuputMessage;
 
@@ -49,41 +49,41 @@ static void heightControllerTask(void *pvParameters) {
     {
         vTaskDelay(pdMS_TO_TICKS(FREQUENCY_HEIGHT_CONTROLLER_TASK));
 
+        xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
 
-        xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
         UARTprintf("\n\nHeight Controller Task");
-        xSemaphoreGive(g_pUARTSemaphore);
-
-
-        QueueHandle_t altitudeInputQueue = getAltitudeInputQueue();
-        QueueHandle_t buttonInputQueue = getButtonInputQueue();
-
-
-        // Read the next button input, if available on queue.
-        if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
-            // Update height based on button buttonInput
-            UARTprintf("\n READ FROM BUTTON QUEUE\n");
-            helicopterHeight = buttonInputMessage;
-            UARTprintf("\n\nHeight: %d", helicopterHeight);
-        }
 
 
         // Reads the altitude input and updates output accordingly
+        QueueHandle_t altitudeInputQueue = getAltitudeInputQueue();
         if (xQueueReceive(altitudeInputQueue, &altitudeInputMessage, 0) == pdPASS) {
             // Calculate roter output to get to wanted altitude
             heightOuputMessage = 1;
-            UARTprintf("\n READ FROM ALTITUDE QUEUE\n");
 
-            QueueHandle_t heightOutputQueue = getHeightOutputQueue();
+            UARTprintf("\n READ FROM ALTITUDE QUEUE\n RESULT: %d",altitudeInputMessage);
+
+            QueueHandle_t heightOutputQueue = *getHeightOutputQueue();
+
             // Write to output queue
-            if(xQueueSend(heightOutputQueue, &heightOuputMessage , portMAX_DELAY) != pdPASS) {
-                // Error. The queue should never be full.
-                UARTprintf("\nQueue full. This should never happen.\n");
-                while(1)
-                {
-                }
-            }
+            //if(xQueueSend(heightOutputQueue, &heightOuputMessage , 0) != pdPASS) {
+            //    UARTprintf("\nERROR: Queue full. This should never happen.\n");
+            //    while(1)
+            //    {
+            //    }
+            //}
         }
+
+        // Read the next button input, if available on queue.
+        QueueHandle_t buttonInputQueue = getButtonInputQueue();
+        //if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
+        //    // Update height based on button buttonInput
+        //    UARTprintf("\n READ FROM BUTTON QUEUE\n");
+        //    helicopterHeight = buttonInputMessage;
+        //    UARTprintf("\n\nHeight: %d", helicopterHeight);
+        //}
+
+
+        xSemaphoreGive(UARTSemaphore);
     }
 }
 

@@ -30,7 +30,7 @@
 *The item size and queue size for the height ouput queue.
 **/
 #define HEIGHT_OUTPUT_ITEM_SIZE           sizeof(uint8_t)
-#define HEIGHT_OUTPUT_QUEUE_SIZE          5
+#define HEIGHT_OUTPUT_QUEUE_SIZE          1
 
 
 /**
@@ -41,8 +41,8 @@ QueueHandle_t heightOutputQueue;
 /**
 * Gets the heightOuput queue
 **/
-QueueHandle_t getHeightOutputQueue() {
-   return heightOutputQueue;
+QueueHandle_t *getHeightOutputQueue() {
+   return &heightOutputQueue;
 }
 
 
@@ -58,9 +58,9 @@ static void heightOuputTask(void *pvParameters) {
         *   HEIGHT output READING CODE HERE
         */
 
-        xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
+        xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
         UARTprintf("\n\n Height Output Task");
-        xSemaphoreGive(g_pUARTSemaphore);
+        xSemaphoreGive(UARTSemaphore);
     }
 }
 
