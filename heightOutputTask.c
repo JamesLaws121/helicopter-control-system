@@ -41,8 +41,8 @@ QueueHandle_t heightOutputQueue;
 /**
 * Gets the heightOuput queue
 **/
-QueueHandle_t *getHeightOutputQueue() {
-   return &heightOutputQueue;
+QueueHandle_t getHeightOutputQueue() {
+   return heightOutputQueue;
 }
 
 
@@ -68,8 +68,11 @@ static void heightOuputTask(void *pvParameters) {
 /**
 * Initializes the heightOuput task
 **/
-uint32_t heightOuputTaskInit(void)
+uint32_t heightOutputTaskInit(void)
 {
+
+    // Create a queue for storing height
+    heightOutputQueue = xQueueCreate(HEIGHT_OUTPUT_QUEUE_SIZE, HEIGHT_OUTPUT_ITEM_SIZE);
 
     /*
     * Create the heightOuput task.
@@ -80,8 +83,7 @@ uint32_t heightOuputTaskInit(void)
         return(1); // error creating task, out of memory?
     }
 
-    // Create a queue for storing height
-    heightOutputQueue = xQueueCreate(HEIGHT_OUTPUT_QUEUE_SIZE, HEIGHT_OUTPUT_ITEM_SIZE);
+
 
     // Success.
     return(0);

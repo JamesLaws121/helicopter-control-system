@@ -27,13 +27,82 @@
 #include "heightOutputTask.h"
 #include "altitudeTask.h"
 #include "heightController.h"
+#include "uartSetup.h"
+
 
 
 
 /**
- * The semaphore that protects concurrent access of UART from multiple tasks.
+ * main.c
  */
-SemaphoreHandle_t UARTSemaphore;
+int main(void)
+{
+    // Set the clock rate to 80 MHz
+    SysCtlClockSet (SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
+     SYSCTL_XTAL_16MHZ);
+
+
+
+    if(setupUart() != 0)
+    {
+        // Error while setting up UART
+        while(1)
+        {
+        }
+    }
+
+    /*
+    * Create the button task
+    */
+    if(buttonTaskInit() != 0)
+    {
+        // Error while creating task
+        while(1)
+        {
+            UARTprintf("\n\nERROR creating button task");
+        }
+    }
+
+    /*
+    * Create the altitude task
+    */
+    if(altitudeTaskInit() != 0)
+    {
+        // Error while creating task
+        while(1)
+        {
+            UARTprintf("\n\nERROR creating altitude input task");
+        }
+    }
+
+    /*
+    * Create the heightOuput task
+    */
+    if(heightOutputTaskInit() != 0)
+    {
+        // Error while creating task
+        while(1)
+        {
+            UARTprintf("\n\nERROR creating height output task");
+        }
+    }
+
+    /*
+    * Create the heightController task
+    */
+    if(heightControllerInit() != 0)
+    {
+        // Error while creating task
+        while(1)
+        {
+            UARTprintf("\n\nERROR creating height Controller task");
+        }
+    }
+
+    vTaskStartScheduler(); // Start FreeRTOS!!
+
+    while(1);
+}
 
 
 /**
@@ -50,115 +119,6 @@ void vApplicationStackOverflowHook(TaskHandle_t *pxTask, char *pcTaskName)
     {
     }
 }
-
-
-/**
- * Configure the UART and its pins.  This must be called before UARTprintf().
- */
-void ConfigureUART(void)
-{
-    //
-    // Enable the GPIO Peripheral used by the UART.
-    //
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-
-    //
-    // Enable UART0
-    //
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-
-    //
-    // Configure GPIO Pins for UART mode.
-    //
-    ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
-    ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
-    ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-    //
-    // Use the internal 16MHz oscillator as the UART clock source.
-    //
-    UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
-
-    //
-    // Initialize the UART for console I/O.
-    //
-    UARTStdioConfig(0, 115200, 16000000);
-}
-
-
-/**
- * main.c
- */
-int main(void)
-{
-    // Set the clock rate to 80 MHz
-    SysCtlClockSet (SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
-     SYSCTL_XTAL_16MHZ);
-
-    // Initialize the UART and configure it for 115,200, 8-N-1 operation.
-    ConfigureUART();
-
-
-    UARTprintf("\n\nWelcome to project");
-
-
-    // Create a binary semaphore to guard the UART.
-    UARTSemaphore = xSemaphoreCreateBinary();
-    while ( UARTSemaphore == NULL ) {
-
-    }
-    xSemaphoreGive(UARTSemaphore);
-
-
-    /*
-    * Create the button task
-    */
-    if(buttonTaskInit() != 0)
-    {
-        // Error while creating task
-        while(1)
-        {
-        }
-    }
-
-    /*
-    * Create the altitude task
-    */
-    if(altitudeTaskInit() != 0)
-    {
-        // Error while creating task
-        while(1)
-        {
-        }
-    }
-
-    /*
-    * Create the heightOuput task
-    */
-    if(heightOuputTaskInit() != 0)
-    {
-        // Error while creating task
-        while(1)
-        {
-        }
-    }
-
-    /*
-    * Create the heightController task
-    */
-    if(heightControllerInit() != 0)
-    {
-        // Error while creating task
-        while(1)
-        {
-        }
-    }
-
-    vTaskStartScheduler(); // Start FreeRTOS!!
-
-    while(1);
-}
-
 
 
 void vAssertCalled( const char * pcFile, unsigned long ulLine ) {

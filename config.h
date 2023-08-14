@@ -19,11 +19,11 @@
 #define PRIORITY_HEIGHT_OUTPUT_TASK         4
 
 // The frequencies of the various tasks.
-
-#define FREQUENCY_BUTTON_TASK              5010
-#define FREQUENCY_HEIGHT_CONTROLLER_TASK    6020
-#define FREQUENCY_ALTITUDE_TASK             1030
-#define FREQUENCYY_HEIGHT_OUTPUT_TASK       8040
+// These are purposely prime numbers
+#define FREQUENCY_BUTTON_TASK              2131
+#define FREQUENCY_HEIGHT_CONTROLLER_TASK    4073
+#define FREQUENCY_ALTITUDE_TASK             1087
+#define FREQUENCYY_HEIGHT_OUTPUT_TASK       7027
 
 // The UART semaphore
 extern SemaphoreHandle_t UARTSemaphore;

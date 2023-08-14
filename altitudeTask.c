@@ -59,7 +59,7 @@ QueueHandle_t getAltitudeInputQueue() {
 * This task reads the altitude and puts this information in the altitudenputQueue
 **/
 static void altitudeTask(void *pvParameters) {
-    // Initializes the ADC peripheral 
+    // Initializes the ADC peripheral
     initADC();
 
     uint8_t sampleCount = 0;
@@ -82,7 +82,7 @@ static void altitudeTask(void *pvParameters) {
             sampleCount = 0;
             uint16_t sampleAverage = getBufferMean();
             
-            if(xQueueSend(altitudeInputQueue, &sampleAverage , 0) != pdPASS) {
+            if(xQueueSendToBack(altitudeInputQueue, &sampleAverage , 2) != pdPASS) {
                 UARTprintf("\nERROR: Queue full. This should never happen.\n");
             }
             uint16_t ulValReceived = 0;

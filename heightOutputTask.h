@@ -11,12 +11,12 @@
 /**
 * Initializes the height output task
 **/
-uint32_t heightOuputTaskInit (void);
+uint32_t heightOutputTaskInit (void);
 
 /**
 * Gets the heightOuput queue
 **/
-QueueHandle_t* getHeightOutputQueue();
+QueueHandle_t getHeightOutputQueue();
 
 
 #endif /* HEIGHTOUTPUT_H_ */

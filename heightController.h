@@ -11,5 +11,7 @@
 
 uint32_t heightControllerInit (void);
 
+QueueHandle_t getCalibrationQueue();
+
 
 #endif /* HEIGHTCONTROLLER_H_ */
