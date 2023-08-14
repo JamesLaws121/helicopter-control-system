@@ -85,7 +85,7 @@ void updateDisplay ()
 
     OLEDStringDraw ("    Set goal    ", 0, 0);
     OLEDStringDraw ("                ", 0, 1);
-    OLEDStringDraw ("      Hi        ", 0, 2);
+    OLEDStringDraw ("      HELP      ", 0, 2);
     OLEDStringDraw ("                ", 0, 3);
 
 }

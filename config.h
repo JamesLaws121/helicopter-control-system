@@ -17,7 +17,7 @@
 
 // The frequencies of the various tasks.
 
-#define FREQUENCY_BUTTON_TASK              5000
+#define FREQUENCY_BUTTON_TASK               50
 #define FREQUENCY_HEIGHT_CONTROLLER_TASK    6000
 #define FREQUENCY_ALTITUDE_TASK             7000
 #define FREQUENCYY_HEIGHT_OUTPUT_TASK       8000

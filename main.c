@@ -17,6 +17,7 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
+#include "drivers/buttons.h"
 #include "utils/uartstdio.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -58,7 +59,8 @@ void vApplicationStackOverflowHook(TaskHandle_t *pxTask, char *pcTaskName)
 /**
  * Configure the UART and its pins.  This must be called before UARTprintf().
  */
-void ConfigureUART(void)
+void
+ConfigureUART(void)
 {
     //
     // Enable the GPIO Peripheral used by the UART.
@@ -88,7 +90,6 @@ void ConfigureUART(void)
     UARTStdioConfig(0, 115200, 16000000);
 }
 
-
 /**
  * main.c
  */
@@ -102,11 +103,6 @@ int main(void)
     ConfigureUART();
 
     OLEDInitialise();
-    updateDisplay();
-
-
-
-    UARTprintf("\n\nWelcome to project");
 
 
     // Create a mutex to guard the UART.
@@ -156,6 +152,7 @@ int main(void)
         {
         }
     }
+    updateDisplay();
 
     vTaskStartScheduler(); // Start FreeRTOS!!
 

@@ -16,6 +16,7 @@
 #include "driverlib/sysctl.h"
 #include "drivers/buttons.h"
 #include "utils/uartstdio.h"
+#include "OrbitOLED/OrbitOLEDInterface.h"
 #include "config.h"
 #include "task.h"
 #include "queue.h"
@@ -30,10 +31,12 @@
  #define BUTTON_INPUT_ITEM_SIZE           sizeof(uint8_t)
  #define BUTTON_INPUT_QUEUE_SIZE          5
 
+#define portTICK_RATE_MS 1000
+
 /**
 * The stack size for the buttons task
 **/
-#define BUTTON_TASK_STACK_SIZE    32         // Stack size in words
+#define BUTTON_TASK_STACK_SIZE    512         // Stack size in words
 
 
 
@@ -58,19 +61,14 @@ QueueHandle_t getButtonInputQueue() {
 **/
 static void buttonTask(void *pvParameters) {
 
-    uint32_t ui16LastTime;
-    uint32_t ui32SwitchDelay = 25;
     uint8_t ui8CurButtonState, ui8PrevButtonState;
     uint8_t ui8Message;
 
     ui8CurButtonState = ui8PrevButtonState = 0;
 
-//    ui16LastTime = xTaskGetTickCount();
-
     while(1)
     {
         vTaskDelay(pdMS_TO_TICKS(FREQUENCY_BUTTON_TASK));
-        UARTprintf("In the while loop.\n");
 
         ui8CurButtonState = ButtonsPoll(0, 0);
 
@@ -91,22 +89,34 @@ static void buttonTask(void *pvParameters) {
                 {
                     ui8Message = LEFT_BUTTON;
 
+                    //Put actual functionality here
+                    UARTprintf("\n\nLeft button pressed");
+                    OLEDStringDraw ("    LEFT        ", 0, 0);
+                    OLEDStringDraw ("     Press      ", 0, 1);
+                    OLEDStringDraw ("                ", 0, 2);
+                    OLEDStringDraw ("                ", 0, 3);
+
                     //
                     // Guard UART from concurrent access.
                     //
                     xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
-                    UARTprintf("Left Button is pressed.\n");
                     xSemaphoreGive(g_pUARTSemaphore);
                 }
                 else if((ui8CurButtonState & ALL_BUTTONS) == RIGHT_BUTTON)
                 {
                     ui8Message = RIGHT_BUTTON;
 
+                    //Put actual functionality here
+                    UARTprintf("\n\nRight button pressed");
+                    OLEDStringDraw ("    RIGHT       ", 0, 0);
+                    OLEDStringDraw ("     Press      ", 0, 1);
+                    OLEDStringDraw ("                ", 0, 2);
+                    OLEDStringDraw ("                ", 0, 3);
+
                     //
                     // Guard UART from concurrent access.
                     //
                     xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
-                    UARTprintf("Right Button is pressed.\n");
                     xSemaphoreGive(g_pUARTSemaphore);
                 }
 
@@ -127,13 +137,6 @@ static void buttonTask(void *pvParameters) {
                 }
             }
         }
-
-//        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_BUTTON_TASK));
-
-
-//        xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
-//        UARTprintf("\n\n Button Input Task");
-//        xSemaphoreGive(g_pUARTSemaphore);
     }
 }
 
@@ -143,7 +146,6 @@ static void buttonTask(void *pvParameters) {
 **/
 uint32_t buttonTaskInit(void)
 {
-
     /*
     * Initialize the buttons
     */
@@ -152,7 +154,7 @@ uint32_t buttonTaskInit(void)
     /*
     * Create the buttons task.
     */
-    if(pdTRUE != xTaskCreate(buttonTask, "buttonTask", BUTTON_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY +
+    if(pdTRUE != xTaskCreate(buttonTask, (const portCHAR *)"buttonTask", BUTTON_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY +
                              PRIORITY_BUTTON_TASK, NULL))
     {
         return(1); // error creating task, out of memory?
