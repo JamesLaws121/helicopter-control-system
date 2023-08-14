@@ -1,8 +1,7 @@
 /*
  * heightOuputTask.h
- *
- *  Created on: 7/08/2023
- *      Author: James Laws
+ * James Laws
+ *  Last modified: 7/08/2023 
  */
 
 #ifndef HEIGHTOUTPUT_H_
@@ -12,12 +11,12 @@
 /**
 * Initializes the height output task
 **/
-extern uint32_t heightOuputTaskInit (void);
+uint32_t heightOutputTaskInit (void);
 
 /**
 * Gets the heightOuput queue
 **/
-extern QueueHandle_t getHeightOutputQueue();
+QueueHandle_t getHeightOutputQueue();
 
 
 #endif /* HEIGHTOUTPUT_H_ */
