@@ -16,7 +16,7 @@
 #include "driverlib/sysctl.h"
 #include "drivers/buttons.h"
 #include "utils/uartstdio.h"
-#include "OrbitOLED/OrbitOLEDInterface.h"
+
 #include "config.h"
 #include "task.h"
 #include "queue.h"
