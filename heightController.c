@@ -35,11 +35,27 @@
 **/
 #define HEIGHT_TASK_STACK_SIZE    128         // Stack size in words
 
-
 QueueHandle_t calibrationQueue;
 
 QueueHandle_t getCalibrationQueue() {
     return calibrationQueue;
+
+/*
+ * Variable for current and desired helicopter height
+ * Note: took out of function to be accessed and extracted using a function in HeightOutputTask
+ */
+
+int helicopterHeight;
+uint16_t altitudeInputMessage;
+
+
+uint16_t getCurrentHeight() {
+   return altitudeInputMessage;
+}
+
+
+int getDesiredtHeight() {
+   return helicopterHeight;
 }
 
 /**
@@ -50,10 +66,11 @@ static void heightControllerTask(void *pvParameters) {
     * This is the current height set by the user
     **/
 
+
     uint8_t buttonInputMessage;
-
-    uint16_t altitudeInputMessage;
-
+    helicopterHeight = 0;
+    altitudeInputMessage = 1;
+    uint8_t buttonInputMessage;
     uint8_t heightOuputMessage;
 
     int8_t groundVoltage = -1;
@@ -111,7 +128,9 @@ static void heightControllerTask(void *pvParameters) {
 
         xSemaphoreGive(UARTSemaphore);
     }
-}
+
+
+
 
 /**
  * Initializes the Height controller
@@ -132,3 +151,5 @@ uint8_t heightControllerInit() {
 
     return 0;
 }
+
+

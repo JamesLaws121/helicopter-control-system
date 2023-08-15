@@ -32,7 +32,7 @@
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
 #include "driverlib/sysctl.h"
-#include "drivers/buttons.h"
+#include "buttons.h"
 
 //*****************************************************************************
 //
