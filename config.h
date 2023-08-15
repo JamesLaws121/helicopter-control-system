@@ -21,10 +21,11 @@
 // The frequencies of the various tasks.
 // These are purposely prime numbers
 
-#define FREQUENCY_BUTTON_TASK               50
+#define FREQUENCY_BUTTON_TASK               52
 #define FREQUENCY_HEIGHT_CONTROLLER_TASK    4073
 #define FREQUENCY_ALTITUDE_TASK             1087
 #define FREQUENCYY_HEIGHT_OUTPUT_TASK       7027
+#define CALIBRATION_FREQUENCY               3027
 
 
 // The UART semaphore

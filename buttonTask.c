@@ -67,12 +67,10 @@ static void buttonTask(void *pvParameters) {
 
     while(1)
     {
-        xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
-        UARTprintf("\n\n Button Input Task");
 
-
-
-        if (calibration_state == 0) {
+        while (calibration_state == 0) {
+            xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
+            vTaskDelay(pdMS_TO_TICKS(CALIBRATION_FREQUENCY));
             // Don't take user input until calibration finished
             UARTprintf("\n\n Calibrating");
             QueueHandle_t calibrationQueue = getCalibrationQueue();
@@ -82,11 +80,15 @@ static void buttonTask(void *pvParameters) {
             } else {
                 UARTprintf("\n\n Still Calibrating");
             }
+            xSemaphoreGive(UARTSemaphore);
             continue;
         }
 
+
+
         vTaskDelay(pdMS_TO_TICKS(FREQUENCY_BUTTON_TASK));
 
+        xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
 
         ui8CurButtonState = ButtonsPoll(0, 0);
 
