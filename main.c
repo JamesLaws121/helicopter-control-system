@@ -17,91 +17,23 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
-#include "drivers/buttons.h"
 #include "utils/uartstdio.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
 
-#include "buttonTask.h"
-#include "heightOutputTask.h"
-#include "altitudeTask.h"
-#include "heightController.h"
-#include "uartSetup.h"
+#include "Group_3/buttonTask.h"
+#include "Group_3/heightOutputTask.h"
+#include "Group_3/altitudeTask.h"
+#include "Group_3/heightController.h"
 
 
 
 /**
- * main.c
+ * The semaphore that protects concurrent access of UART from multiple tasks.
  */
-int main(void)
-{
-    // Set the clock rate to 80 MHz
-    SysCtlClockSet (SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
-     SYSCTL_XTAL_16MHZ);
-
-
-    if(setupUart() != 0)
-    {
-        // Error while setting up UART
-        while(1)
-        {
-        }
-    }
-
-    /*
-    * Create the button task
-    */
-    if(buttonTaskInit() != 0)
-    {
-        // Error while creating task
-        while(1)
-        {
-            UARTprintf("\n\nERROR creating button task");
-        }
-    }
-
-    /*
-    * Create the altitude task
-    */
-    if(altitudeTaskInit() != 0)
-    {
-        // Error while creating task
-        while(1)
-        {
-            UARTprintf("\n\nERROR creating altitude input task");
-        }
-    }
-
-    /*
-    * Create the heightOuput task
-    */
-    if(heightOutputTaskInit() != 0)
-    {
-        // Error while creating task
-        while(1)
-        {
-            UARTprintf("\n\nERROR creating height output task");
-        }
-    }
-
-    /*
-    * Create the heightController task
-    */
-    if(heightControllerInit() != 0)
-    {
-        // Error while creating task
-        while(1)
-        {
-            UARTprintf("\n\nERROR creating height Controller task");
-        }
-    }
-
-    vTaskStartScheduler(); // Start FreeRTOS!!
-
-    while(1);
-}
+SemaphoreHandle_t UARTSemaphore;
 
 
 /**
@@ -117,6 +49,119 @@ void vApplicationStackOverflowHook(TaskHandle_t *pxTask, char *pcTaskName)
     while(1)
     {
     }
+}
+
+
+/**
+ * Configure the UART and its pins.  This must be called before UARTprintf().
+ */
+void ConfigureUART(void)
+{
+    //
+    // Enable the GPIO Peripheral used by the UART.
+    //
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+    //
+    // Enable UART0
+    //
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+
+    //
+    // Configure GPIO Pins for UART mode.
+    //
+    GPIOPinConfigure(GPIO_PA0_U0RX);
+    GPIOPinConfigure(GPIO_PA1_U0TX);
+    GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+    //
+    // Use the internal 16MHz oscillator as the UART clock source.
+    //
+    UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
+
+    //
+    // Initialize the UART for console I/O.
+    //
+    UARTStdioConfig(0, 115200, 16000000);
+}
+
+
+/**
+ * main.c
+ */
+int main(void)
+{
+    // Set the clock rate to 80 MHz
+    SysCtlClockSet (SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
+     SYSCTL_XTAL_16MHZ);
+
+    // Initialize the UART and configure it for 115,200, 8-N-1 operation.
+    ConfigureUART();
+
+
+    UARTprintf("\n\nWelcome to project");
+
+
+    // Create a binary semaphore to guard the UART.
+    UARTSemaphore = xSemaphoreCreateBinary();
+    while ( UARTSemaphore == NULL ) {
+
+    }
+    xSemaphoreGive(UARTSemaphore);
+
+
+    /*
+    * Create the button task
+    */
+    if(buttonTaskInit() != 0)
+    {
+        // Error while creating task
+        while(1)
+        {
+        }
+    }
+
+    /*
+    * Create the altitude task
+    */
+    if(altitudeTaskInit() != 0)
+    {
+        // Error while creating task
+        while(1)
+        {
+        }
+    }
+
+    /*
+    * Create the heightOuput task
+    */
+    if(heightOuputTaskInit() != 0)
+    {
+        // Error while creating task
+        while(1)
+        {
+        }
+    }
+
+    /*
+    * Create the heightController task
+    */
+    if(heightControllerInit() != 0)
+    {
+        // Error while creating task
+        while(1)
+        {
+        }
+    }
+
+    /*
+     * Create PWM TASK
+     */
+     InitializeMotorPWM();
+
+    vTaskStartScheduler(); // Start FreeRTOS!!
+
+    while(1);
 }
 
 
