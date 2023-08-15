@@ -17,6 +17,7 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
+#include "drivers/buttons.h"
 #include "utils/uartstdio.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -31,7 +32,6 @@
 
 
 
-
 /**
  * main.c
  */
@@ -40,7 +40,6 @@ int main(void)
     // Set the clock rate to 80 MHz
     SysCtlClockSet (SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
      SYSCTL_XTAL_16MHZ);
-
 
 
     if(setupUart() != 0)
@@ -119,6 +118,7 @@ void vApplicationStackOverflowHook(TaskHandle_t *pxTask, char *pcTaskName)
     {
     }
 }
+
 
 
 void vAssertCalled( const char * pcFile, unsigned long ulLine ) {

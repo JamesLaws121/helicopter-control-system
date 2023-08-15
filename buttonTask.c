@@ -5,20 +5,23 @@
  *      Author: James Laws
  */
 
-
+#include "FreeRTOS.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
+#include "inc/hw_gpio.h"
 #include "driverlib/gpio.h"
 #include "driverlib/rom.h"
+#include "driverlib/sysctl.h"
 #include "drivers/buttons.h"
 #include "utils/uartstdio.h"
+
 #include "config.h"
-#include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
+
 
 #include "heightController.h"
 
@@ -28,10 +31,13 @@
  #define BUTTON_INPUT_ITEM_SIZE           sizeof(uint8_t)
  #define BUTTON_INPUT_QUEUE_SIZE          5
 
+#define portTICK_RATE_MS 1000
+
 /**
 * The stack size for the buttons task
 **/
 #define BUTTON_TASK_STACK_SIZE    128         // Stack size in words
+
 
 
 
@@ -54,16 +60,17 @@ QueueHandle_t getButtonInputQueue() {
 static void buttonTask(void *pvParameters) {
     uint8_t calibration_state = 0;
 
+    uint8_t ui8CurButtonState, ui8PrevButtonState;
+    uint8_t ui8Message;
+
+    ui8CurButtonState = ui8PrevButtonState = 0;
+
     while(1)
     {
-        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_BUTTON_TASK));
 
-        xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
-        UARTprintf("\n\n Button Input Task");
-        xSemaphoreGive(UARTSemaphore);
-
-
-        if (calibration_state == 0) {
+        while (calibration_state == 0) {
+            xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
+            vTaskDelay(pdMS_TO_TICKS(CALIBRATION_FREQUENCY));
             // Don't take user input until calibration finished
             UARTprintf("\n\n Calibrating");
             QueueHandle_t calibrationQueue = getCalibrationQueue();
@@ -73,13 +80,63 @@ static void buttonTask(void *pvParameters) {
             } else {
                 UARTprintf("\n\n Still Calibrating");
             }
+            xSemaphoreGive(UARTSemaphore);
             continue;
         }
 
-        /*
-        *   BUTTON READING CODE HERE
-        */
 
+
+        vTaskDelay(pdMS_TO_TICKS(FREQUENCY_BUTTON_TASK));
+
+        xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
+
+        ui8CurButtonState = ButtonsPoll(0, 0);
+
+        //
+        // Check if previous debounced state is equal to the current state.
+        //
+        if(ui8CurButtonState != ui8PrevButtonState)
+        {
+            ui8PrevButtonState = ui8CurButtonState;
+
+            //
+            // Check to make sure the change in state is due to button press
+            // and not due to button release.
+            //
+            if((ui8CurButtonState & ALL_BUTTONS) != 0)
+            {
+                if((ui8CurButtonState & ALL_BUTTONS) == LEFT_BUTTON)
+                {
+                    ui8Message = LEFT_BUTTON;
+                    //Put actual functionality here
+                    UARTprintf("\n\nLeft button pressed");
+                }
+                else if((ui8CurButtonState & ALL_BUTTONS) == RIGHT_BUTTON)
+                {
+                    ui8Message = RIGHT_BUTTON;
+
+                    //Put actual functionality here
+                    UARTprintf("\n\nRight button pressed");
+                }
+
+                //
+                // Pass the value of the button pressed to LEDTask.
+                //
+                if(xQueueSend(buttonInputQueue, &ui8Message, portMAX_DELAY) !=
+                   pdPASS)
+                {
+                    //
+                    // Error. The queue should never be full. If so print the
+                    // error message on UART and wait for ever.
+                    //
+                    UARTprintf("\nQueue full. This should never happen.\n");
+                    while(1)
+                    {
+                    }
+                }
+            }
+        }
+        xSemaphoreGive(UARTSemaphore);
     }
 }
 
@@ -89,7 +146,6 @@ static void buttonTask(void *pvParameters) {
 **/
 uint32_t buttonTaskInit(void)
 {
-
     /*
     * Initialize the buttons
     */
@@ -101,7 +157,7 @@ uint32_t buttonTaskInit(void)
     /*
     * Create the buttons task.
     */
-    if(pdTRUE != xTaskCreate(buttonTask, "buttonTask", BUTTON_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY +
+    if(pdTRUE != xTaskCreate(buttonTask, (const portCHAR *)"buttonTask", BUTTON_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY +
                              PRIORITY_BUTTON_TASK, NULL))
     {
         return(1); // error creating task, out of memory?
