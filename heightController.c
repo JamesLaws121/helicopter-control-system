@@ -104,12 +104,10 @@ static void heightControllerTask(void *pvParameters) {
 
         // Read the next button input, if available on queue.
         QueueHandle_t buttonInputQueue = getButtonInputQueue();
-        //if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
-        //    // Update height based on button buttonInput
-        //    UARTprintf("\n READ FROM BUTTON QUEUE\n");
-        //    helicopterHeight = buttonInputMessage;
-        //    UARTprintf("\n\nHeight: %d", helicopterHeight);
-        //}
+        if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
+            // Update height based on button buttonInput
+            UARTprintf("\n\BUTTON: %d", buttonInputMessage); //16 for left, 1 for right
+        }
 
 
         xSemaphoreGive(UARTSemaphore);
