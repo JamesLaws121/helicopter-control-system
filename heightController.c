@@ -11,8 +11,9 @@
 #include "inc/hw_types.h"
 #include "driverlib/gpio.h"
 #include "driverlib/rom.h"
+
 #include "drivers/buttons.h"
-#include "utils/uartstdio.h"
+#include "drivers/uartstdio.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -40,23 +41,7 @@ QueueHandle_t calibrationQueue;
 QueueHandle_t getCalibrationQueue() {
     return calibrationQueue;
 
-/*
- * Variable for current and desired helicopter height
- * Note: took out of function to be accessed and extracted using a function in HeightOutputTask
- */
 
-int helicopterHeight;
-uint16_t altitudeInputMessage;
-
-
-uint16_t getCurrentHeight() {
-   return altitudeInputMessage;
-}
-
-
-int getDesiredtHeight() {
-   return helicopterHeight;
-}
 
 /**
 * This task monitors and alters the helicopters height
@@ -66,19 +51,17 @@ static void heightControllerTask(void *pvParameters) {
     * This is the current height set by the user
     **/
 
+    uint8_t buttonInputMessage;
+    uint16_t altitudeInputMessage;
 
-    uint8_t buttonInputMessage;
-    helicopterHeight = 0;
-    altitudeInputMessage = 1;
-    uint8_t buttonInputMessage;
-    uint8_t heightOuputMessage;
+    HeightStructure_t heightOutputMessage;
+
 
     int8_t groundVoltage = -1;
 
     while(1)
     {
         vTaskDelay(pdMS_TO_TICKS(FREQUENCY_HEIGHT_CONTROLLER_TASK));
-        heightOuputMessage = 0;
         xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
 
         UARTprintf("\n\nHeight Controller Task");
@@ -86,10 +69,11 @@ static void heightControllerTask(void *pvParameters) {
 
         // Reads the altitude input and updates output accordingly
         QueueHandle_t altitudeInputQueue = getAltitudeInputQueue();
+
         if (xQueueReceive(altitudeInputQueue, &altitudeInputMessage, 0) == pdPASS) {
             // Calculate roter output to get to wanted altitude
             UARTprintf("\n READ FROM ALTITUDE QUEUE\n RESULT: %d",altitudeInputMessage);
-            heightOuputMessage = altitudeInputMessage/10;
+            heightOutputMessage.currentHeight = altitudeInputMessage/10;
 
             // Calibrate ground voltage
             if (groundVoltage == -1) {
@@ -106,16 +90,16 @@ static void heightControllerTask(void *pvParameters) {
 
 
 
-          // Write to output queue
-//        if ( groundVoltage != -1 && heightOuputMessage != 0) {
-//            // Calculations HERE
-//            UARTprintf("\n Send data to height output\n");
-//
-//            QueueHandle_t heightOutputQueue = getHeightOutputQueue();
-//            if(xQueueSendToBack(heightOutputQueue, &heightOuputMessage , 5) != pdPASS) {
-//                UARTprintf("\nERROR: Queue full. This should never happen.\n");
-//            }
-//        }
+        // Write to output queue
+        if ( groundVoltage != -1 && heightOuputMessage != 0) {
+            // Calculations HERE
+            UARTprintf("\n Send data to height output\n");
+
+            QueueHandle_t heightOutputQueue = getHeightOutputQueue();
+            if(xQueueSendToBack(heightOutputQueue, &heightOutputMessage , 5) != pdPASS) {
+                UARTprintf("\nERROR: Queue full. This should never happen.\n");
+            }
+        }
 
 
         // Read the next button input, if available on queue.

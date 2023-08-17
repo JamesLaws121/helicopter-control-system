@@ -15,12 +15,13 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
-#include "utils/uartstdio.h"
+
 #include "FreeRTOS.h"
+#include "drivers/uartstdio.h"
+
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
-
 #include "config.h"
 
 

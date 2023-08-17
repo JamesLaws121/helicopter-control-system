@@ -15,11 +15,15 @@ uint32_t heightControllerInit (void);
 QueueHandle_t getCalibrationQueue();
 
 
-/**
- * current and desired heigh of the Helicopter
+/*
+ * Struct for storing current and desired helicopter height
  */
-extern uint16_t getCurrentHeight();
-extern int getDesiredtHeight();
+typedef struct HeightStructure {
+    uint16_t currentHeight;
+    uint8_t desiredHeight;
+} HeightStructure_t;
+
+
 
 
 #endif /* HEIGHTCONTROLLER_H_ */

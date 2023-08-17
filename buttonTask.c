@@ -14,8 +14,9 @@
 #include "driverlib/gpio.h"
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
+
 #include "drivers/buttons.h"
-#include "utils/uartstdio.h"
+#include "drivers/uartstdio.h"
 
 #include "config.h"
 #include "task.h"
