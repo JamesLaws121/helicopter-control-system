@@ -69,8 +69,8 @@ static void altitudeTask(void *pvParameters) {
 
 
         xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
-        UARTprintf("\n\n Altitude Input Task");
-        xSemaphoreGive(UARTSemaphore);
+        //UARTprintf("\n\n Altitude Input Task");
+
 
 
         // Trigger the collection of altitude data
@@ -89,6 +89,7 @@ static void altitudeTask(void *pvParameters) {
             xQueuePeek( altitudeInputQueue, &ulValReceived, 0 );
             UARTprintf("\n\nItem sent %d", ulValReceived);
         }
+        xSemaphoreGive(UARTSemaphore);
         
     }
 }

@@ -21,6 +21,8 @@
 #include "queue.h"
 #include "semphr.h"
 
+#include "config.h"
+
 
 /**
  * The semaphore that protects concurrent access of UART from multiple tasks.
