@@ -3,10 +3,10 @@
 
 
 ## Authors
-James Laws
-Benjamin Stewart
-AJ Seville
-Thomas Clifton
+### James Laws
+### Benjamin Stewart
+### AJ Seville
+### Thomas Clifton
 
 ## Description
 Real-time control software to run on a Tiva microcontroller (MCU), to interact and control a supplied helicopter emulator program running on a separate
