@@ -64,7 +64,7 @@ void ConfigureUART(void)
     UARTStdioConfig(0, 115200, 16000000);
 }
 
-int setupUart() {
+uint8_t setupUart(void) {
     // Initialize the UART and configure it for 115,200, 8-N-1 operation.
     ConfigureUART();
 

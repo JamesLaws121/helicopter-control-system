@@ -18,6 +18,8 @@
 #include "drivers/ustdlib.h"
 #include "types/circBufT.h"
 
+#include "analogueConverter.h"
+
 // Buffer size
 #define BUF_SIZE 10
 
@@ -46,7 +48,7 @@ void ADCIntHandler(void)
 /*
 * Initializes the ADC peripheral
 */
-void initADC(void)
+uint8_t initADC(void)
 {
     // initialize the altitude circular buffer
     initCircBuf(&adcBuffer, BUF_SIZE);
@@ -75,12 +77,14 @@ void initADC(void)
 
     // Enable interrupts for ADC0 sequence 3 (clears any outstanding interrupts)
     ADCIntEnable(ADC0_BASE, 3);
+
+    return 1;
 }
 
 /*
 * Calculates and return the rounded mean of the buffer contents
 */
-uint16_t getBufferMean(){
+uint16_t getBufferMean(void){
     uint32_t sum = 0;
     uint8_t i;
     for (i = 0; i < BUF_SIZE; i++)

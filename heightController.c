@@ -22,6 +22,7 @@
 #include "config.h"
 #include "buttonTask.h"
 #include "heightOutputTask.h"
+#include "heightController.h"
 #include "altitudeTask.h"
 
  /**
@@ -38,9 +39,9 @@
 
 QueueHandle_t calibrationQueue;
 
-QueueHandle_t getCalibrationQueue() {
+QueueHandle_t getCalibrationQueue(void) {
     return calibrationQueue;
-
+}
 
 
 /**
@@ -84,21 +85,15 @@ static void heightControllerTask(void *pvParameters) {
                 if(xQueueSendToBack(calibrationQueue, &calibrationMessage , 5) != pdPASS) {
                     UARTprintf("\nERROR: calibration queue full. This should never happen.\n");
                 }
+            } else {
+                // Write to output queue
+                UARTprintf("\n Send data to height output\n");
+                QueueHandle_t heightOutputQueue = getHeightOutputQueue();
+                if(xQueueSendToBack(heightOutputQueue, &heightOutputMessage , 5) != pdPASS) {
+                    UARTprintf("\nERROR: Queue full. This should never happen.\n");
+                }
             }
 
-        }
-
-
-
-        // Write to output queue
-        if ( groundVoltage != -1 && heightOuputMessage != 0) {
-            // Calculations HERE
-            UARTprintf("\n Send data to height output\n");
-
-            QueueHandle_t heightOutputQueue = getHeightOutputQueue();
-            if(xQueueSendToBack(heightOutputQueue, &heightOutputMessage , 5) != pdPASS) {
-                UARTprintf("\nERROR: Queue full. This should never happen.\n");
-            }
         }
 
 
@@ -106,20 +101,20 @@ static void heightControllerTask(void *pvParameters) {
         QueueHandle_t buttonInputQueue = getButtonInputQueue();
         if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
             // Update height based on button buttonInput
-            UARTprintf("\n\BUTTON: %d", buttonInputMessage); //16 for left, 1 for right
+            UARTprintf("\n BUTTON: %d", buttonInputMessage); //16 for left, 1 for right
         }
 
 
         xSemaphoreGive(UARTSemaphore);
     }
-
+}
 
 
 
 /**
  * Initializes the Height controller
  */
-uint8_t heightControllerInit() {
+uint8_t heightControllerInit(void) {
 
     // Create a queue for calibrating the ground
     calibrationQueue = xQueueCreate(CALIBRATION_QUEUE_SIZE, CALIBRATION_ITEM_SIZE);

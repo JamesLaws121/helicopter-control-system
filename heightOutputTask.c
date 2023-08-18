@@ -36,9 +36,6 @@
 
 
 
-
-
-
 /**
 * The stack size for the heightOuput task
 **/
@@ -60,7 +57,7 @@ QueueHandle_t heightOutputQueue;
 /**
 * Gets the heightOuput queue
 **/
-QueueHandle_t getHeightOutputQueue() {
+QueueHandle_t getHeightOutputQueue(void) {
    return heightOutputQueue;
 }
 
@@ -87,7 +84,7 @@ static void heightOuputTask(void *pvParameters) {
 /**
 * Initializes the heightOuput task
 **/
-uint32_t heightOutputTaskInit(void)
+uint8_t heightOutputTaskInit(void)
 {
 
     // Create a queue for storing height
@@ -101,11 +98,6 @@ uint32_t heightOutputTaskInit(void)
     {
         return(1); // error creating task, out of memory?
     }
-
-
-
-
-
 
 
 

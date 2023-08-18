@@ -23,7 +23,7 @@
 #include "queue.h"
 #include "semphr.h"
 
-
+#include "buttonTask.h"
 #include "heightController.h"
 
  /**
@@ -51,7 +51,7 @@ QueueHandle_t buttonInputQueue;
 /**
 * Gets the button input queue
 **/
-QueueHandle_t getButtonInputQueue() {
+QueueHandle_t getButtonInputQueue(void) {
     return buttonInputQueue;
 }
 
@@ -145,7 +145,7 @@ static void buttonTask(void *pvParameters) {
 /**
 * Initializes the buttons task
 **/
-uint32_t buttonTaskInit(void)
+uint8_t buttonTaskInit(void)
 {
     /*
     * Initialize the buttons

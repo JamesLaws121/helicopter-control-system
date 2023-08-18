@@ -17,11 +17,11 @@ void ADCIntHandler(void);
 /*
 * Initializes the ADC peripheral
 */
-void initADC (void);
+uint8_t initADC(void);
 
 /*
 * Calculates and return the rounded mean of the buffer contents
 */
-uint16_t getBufferMean();
+uint16_t getBufferMean(void);
 
 #endif /* ANALOGUECONVERTER_H_ */

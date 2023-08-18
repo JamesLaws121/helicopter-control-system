@@ -9,7 +9,7 @@
 #define UARTSETUP_H_
 
 
-int setupUart();
+uint8_t setupUart(void);
 
 
 #endif /* UARTSETUP_H_ */

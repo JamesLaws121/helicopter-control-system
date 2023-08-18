@@ -17,6 +17,7 @@
 #include "drivers/uartstdio.h"
 
 
+#include "altitudeTask.h"
 #include "config.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -52,7 +53,7 @@ QueueHandle_t altitudeInputQueue;
 /**
 * Gets the altitude input queue
 **/
-QueueHandle_t getAltitudeInputQueue() {
+QueueHandle_t getAltitudeInputQueue(void) {
    return altitudeInputQueue;
 }
 

@@ -58,7 +58,7 @@ void Motor_PIController(double delta_t);
  *  Initializing Motor PWM
  *  Motor uses M0PWM7 (j4-05) as referred in Table1 TIVA MCU I/O data signals
  */
-void motorTaskInit(void);
+uint8_t motorTaskInit(void);
 
 
 #endif /* DRIVERS_MOTOR_H_ */

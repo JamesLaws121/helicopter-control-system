@@ -20,15 +20,19 @@
 
 #include "FreeRTOS.h"
 #include "drivers/uartstdio.h"
+#include "drivers/motor.h"
+
 
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
 
+
 #include "buttonTask.h"
 #include "heightOutputTask.h"
 #include "altitudeTask.h"
 #include "heightController.h"
+#include "uartSetup.h"
 
 
 

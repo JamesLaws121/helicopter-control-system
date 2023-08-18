@@ -9,11 +9,11 @@
 /*
 * Initializes the buttons task
 */
-uint32_t buttonTaskInit(void);
+uint8_t buttonTaskInit(void);
 
 /**
 * Gets the button input queue
 **/
-QueueHandle_t getButtonInputQueue();
+QueueHandle_t getButtonInputQueue(void);
 
 #endif // BUTTTONTASK_H_

@@ -9,10 +9,11 @@
 #ifndef HEIGHTCONTROLLER_H_
 #define HEIGHTCONTROLLER_H_
 
-uint32_t heightControllerInit (void);
+
+uint8_t heightControllerInit(void);
 
 
-QueueHandle_t getCalibrationQueue();
+QueueHandle_t getCalibrationQueue(void);
 
 
 /*
