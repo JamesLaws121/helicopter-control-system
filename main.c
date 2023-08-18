@@ -35,8 +35,6 @@
 #include "uartSetup.h"
 
 
-
-
 /**
  * main.c
  */
@@ -45,6 +43,7 @@ int main(void)
     // Set the clock rate to 80 MHz
     SysCtlClockSet (SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
      SYSCTL_XTAL_16MHZ);
+
 
     if(setupUart() != 0)
     {
@@ -106,17 +105,7 @@ int main(void)
         }
     }
 
-    /*
-    *  Create motor PWM TASK
-    */
-    if(motorTaskInit() != 0)
-    {
-        // Error while creating task
-        while(1)
-        {
-            UARTprintf("\n\nERROR creating button task");
-        }
-    }
+
 
 
     vTaskStartScheduler(); // Start FreeRTOS!!

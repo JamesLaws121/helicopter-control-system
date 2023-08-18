@@ -60,7 +60,7 @@
  *  PWM configurations
  */
 #define PWM_DUTY_FIXED              67
-#define INITIAL_PWM_FREQ            250
+
 #define MAX_PWM                     85
 #define MIN_PWM                     15
 #define MOTOR_CONSTANT              15
@@ -71,12 +71,6 @@
 #define MAX_ERROR                   20
 #define MIN_ERROR                  -20
 
-
-
-int32_t motorDuty;
-TimerHandle_t PWMTimer;
-
-double integratedHeightError, previousHeightError;
 
 
 
@@ -94,31 +88,13 @@ void setPWM(uint32_t ui32Freq, uint32_t ui32Duty)
 }
 
 
-/*
-* freeRTOS task to set the duty cylce for the main
-* rotor
-*/
-void motorPWM(TimerHandle_t pxTimer)
-{
-
-    int32_t currentHeight = 0;
-
-    if (currentHeight > -1)
-    {
-        // Calculate the duty cycle required
-        Motor_PIController(DELTA_T);
-    }
-
-    // Set the duty cycle required
-    setPWM(INITIAL_PWM_FREQ, motorDuty);
-}
 
 
 /*
 * Calculates the duty for the motor. Uses the AltitudeTask
 * to find the current height and the desired height
 */
-void Motor_PIController(double delta_t)
+uint32_t calculateMotorDuty(HeightStructure_t heightInput, double integratedHeightError )
 {
     double heightError;                                    // The altitude error
 
@@ -126,12 +102,8 @@ void Motor_PIController(double delta_t)
     double kpHeight = MOTOR_KP;                         // Proportional Gain
     double kiHeight = MOTOR_KI;                         // Integral Gains
 
-    // Error calc for height (Need to current height from Altitude task?)
-    int32_t currentHeight = 0;
-    if (currentHeight > -1)
-    {
-        heightError = 0 - currentHeight;    // Height Error
-    }
+    // Error calc for height
+    heightError = 0 - heightInput.currentHeight;    // Height Error
 
     // Need to cap the errors to avoid overshooting the target (controller patch)
     if (heightError >= MAX_ERROR)
@@ -144,30 +116,30 @@ void Motor_PIController(double delta_t)
         heightError = MIN_ERROR;
     }
 
-    integratedHeightError += heightError * delta_t;            // Integral Height Error
+     integratedHeightError += heightError * heightInput.desiredHeight;            // Integral Height Error
+
+     // Recored previous height error for the integral error
+     // previousHeightError = heightError;
+
 
     // Calculation of the main rotor's duty cycle
     int32_t mainDuty = MOTOR_CONSTANT + kpHeight * heightError + kiHeight * integratedHeightError;
 
-
     // Specified limits given from the lecture
     if (mainDuty > MAX_PWM)
     {
-        motorDuty = MAX_PWM;                       // Set the duty cycle ceiling
+        return MAX_PWM;                       // Set the duty cycle ceiling
     }
 
     else if (mainDuty < MIN_PWM)
     {
-        motorDuty = MIN_PWM;                       // Set the duty cycle floor
+        return MIN_PWM;                       // Set the duty cycle floor
     }
 
     else
     {
-        motorDuty = mainDuty;
+        return mainDuty;
     }
-
-        // Recored previous height error for the integral error
-    previousHeightError = heightError;
 }
 
 
@@ -177,35 +149,25 @@ void Motor_PIController(double delta_t)
  *  Initializing Motor PWM
  *  Motor uses M0PWM7 (j4-05) as referred in Table1 TIVA MCU I/O data signals
  */
-uint8_t motorTaskInit(void)
+uint8_t motorInit(void)
 {
+    SysCtlPeripheralReset (PWM_PERIPH_GPIO); // Used for PWM output
+    SysCtlPeripheralReset (PWM_PERIPH_PWM);  // Main Rotor PWM
 
     SysCtlPeripheralEnable(PWM_PERIPH_PWM);
     SysCtlPeripheralEnable(PWM_PERIPH_GPIO);
 
     GPIOPinConfigure(GPIO_PWM_CONFIG);
     GPIOPinTypePWM(GPIO_MOTOR_BASE, GPIO_PWM_MOTOR_PIN);
-    PWMGenConfigure(PWM_MOTOR_GENERATOR, PWM_MOTOR_GENERATOR, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
+
+    PWMGenConfigure(PWM_MOTOR_GENERATOR, PWM_MAIN_GEN, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
 
     // Initialize parameters for PWM
     setPWM(INITIAL_PWM_FREQ, PWM_DUTY_FIXED);
-    PWMGenEnable(PWM_MOTOR_GENERATOR, PWM_MOTOR_GENERATOR);
+    PWMGenEnable(PWM_MOTOR_GENERATOR, PWM_MAIN_GEN);
 
     SysCtlPWMClockSet(SYSCTL_PWMDIV_4);
 
-    // Need to make timers to trigger rotor controller
-    PWMTimer = xTimerCreate("MotorTimer", pdMS_TO_TICKS(PDMS_TO_TICKS), pdTRUE, (void*) 5, motorPWM);
-
-    if (PWMTimer == NULL)
-    {
-        return 1;
-    }
-
-    // Start the timer
-    if (!xTimerStart(PWMTimer, 0))
-    {
-        return 1;
-    }
 
     return 0;
 

@@ -21,7 +21,7 @@ QueueHandle_t getCalibrationQueue(void);
  */
 typedef struct HeightStructure {
     uint16_t currentHeight;
-    uint8_t desiredHeight;
+    uint16_t desiredHeight;
 } HeightStructure_t;
 
 

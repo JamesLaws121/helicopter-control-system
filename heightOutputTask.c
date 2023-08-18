@@ -32,6 +32,7 @@
 #include "semphr.h"
 
 #include "heightController.h"
+#include "heightOutputTask.h"
 
 
 
@@ -39,7 +40,7 @@
 /**
 * The stack size for the heightOuput task
 **/
-#define HEIGHT_OUTPUT_TASK_STACK_SIZE    32         // Stack size in words
+#define HEIGHT_OUTPUT_TASK_STACK_SIZE    128         // Stack size in words
 
 /**
 *The item size and queue size for the height output queue.
@@ -67,15 +68,33 @@ QueueHandle_t getHeightOutputQueue(void) {
 **/
 static void heightOuputTask(void *pvParameters) {
 
+    uint32_t motorDuty;
+
+    HeightStructure_t heightOutput;
+    heightOutput.currentHeight = 0;
+    heightOutput.desiredHeight = 0;
+
+    double integratedHeightError = 0;
+
     while(1)
     {
         vTaskDelay(pdMS_TO_TICKS(FREQUENCYY_HEIGHT_OUTPUT_TASK));
-        /*
-        *   HEIGHT output READING CODE HERE
-        */
-
         xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
         UARTprintf("\n\n Height Output Task");
+
+        if (xQueueReceive(heightOutputQueue, &heightOutput, 0) == pdPASS) {
+            UARTprintf("\n READ FROM Height output QUEUE\n RESULT CURRENT HEIGHT: %d",heightOutput.currentHeight);
+            UARTprintf("\n READ FROM Height output QUEUE\n RESULT DESIRED HEIGHT: %d",heightOutput.desiredHeight);
+        }
+
+        // Calculate the duty cycle required
+        motorDuty = calculateMotorDuty(heightOutput, integratedHeightError);
+
+        // Set the duty cycle required
+        setPWM(INITIAL_PWM_FREQ, motorDuty);
+
+
+
         xSemaphoreGive(UARTSemaphore);
     }
 }
@@ -87,6 +106,14 @@ static void heightOuputTask(void *pvParameters) {
 uint8_t heightOutputTaskInit(void)
 {
 
+    /*
+    * Initializes motor
+    */
+    if(motorInit() != 0)
+    {
+        return 1;
+    }
+
     // Create a queue for storing height
     heightOutputQueue = xQueueCreate(HEIGHT_OUTPUT_QUEUE_SIZE, HEIGHT_OUTPUT_ITEM_SIZE);
 
@@ -96,7 +123,7 @@ uint8_t heightOutputTaskInit(void)
     if(pdTRUE != xTaskCreate(heightOuputTask, "heightOuputTask", HEIGHT_OUTPUT_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY +
                    PRIORITY_HEIGHT_OUTPUT_TASK, NULL))
     {
-        return(1); // error creating task, out of memory?
+        return 1; // error creating task, out of memory?
     }
 
 

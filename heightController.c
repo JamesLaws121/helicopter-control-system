@@ -56,6 +56,8 @@ static void heightControllerTask(void *pvParameters) {
     uint16_t altitudeInputMessage;
 
     HeightStructure_t heightOutputMessage;
+    heightOutputMessage.currentHeight = 0;
+    heightOutputMessage.desiredHeight = 0;
 
 
     int8_t groundVoltage = -1;
@@ -66,6 +68,20 @@ static void heightControllerTask(void *pvParameters) {
         xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
 
         UARTprintf("\n\nHeight Controller Task");
+
+
+        // Read the next button input, if available on queue.
+        QueueHandle_t buttonInputQueue = getButtonInputQueue();
+        if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
+            // Update height based on button buttonInput
+            UARTprintf("\n BUTTON: %d", buttonInputMessage); //16 for left, 1 for right
+
+            if (buttonInputMessage == 16 && heightOutputMessage.currentHeight > 0) {
+                heightOutputMessage.desiredHeight -= 10;
+            } else if (buttonInputMessage == 1 && heightOutputMessage.currentHeight < 2000) {
+                heightOutputMessage.desiredHeight += 10;
+            }
+        }
 
 
         // Reads the altitude input and updates output accordingly
@@ -89,20 +105,15 @@ static void heightControllerTask(void *pvParameters) {
                 // Write to output queue
                 UARTprintf("\n Send data to height output\n");
                 QueueHandle_t heightOutputQueue = getHeightOutputQueue();
-                if(xQueueSendToBack(heightOutputQueue, &heightOutputMessage , 5) != pdPASS) {
-                    UARTprintf("\nERROR: Queue full. This should never happen.\n");
+                if(xQueueOverwrite(heightOutputQueue, &heightOutputMessage) != pdPASS) {
+                    UARTprintf("\nERROR: height output queue full. This should never happen.\n");
                 }
             }
 
         }
 
 
-        // Read the next button input, if available on queue.
-        QueueHandle_t buttonInputQueue = getButtonInputQueue();
-        if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
-            // Update height based on button buttonInput
-            UARTprintf("\n BUTTON: %d", buttonInputMessage); //16 for left, 1 for right
-        }
+
 
 
         xSemaphoreGive(UARTSemaphore);

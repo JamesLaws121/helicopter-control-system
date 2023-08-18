@@ -16,7 +16,6 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/sysctl.h"
-
 #include "drivers/buttons.h"
 #include "drivers/uartstdio.h"
 
@@ -26,13 +25,16 @@
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
-
 #include "heightController.h"
+
+#define INITIAL_PWM_FREQ    250
 
 
 #ifndef DRIVERS_MOTOR_H_
 #define DRIVERS_MOTOR_H_
 
+
+TimerHandle_t PWMTimer;
 
 /**
 * Function to set the Period and duty cycle of main motor
@@ -41,24 +43,17 @@ void setPWM(uint32_t ui32Freq, uint32_t ui32Duty);
 
 
 /*
-* freeRTOS task to set the duty cylce for the main
-* rotor
-*/
-void motorPWM(TimerHandle_t pxTimer);
-
-
-/*
 * Calculates the duty for the motor. Uses the AltitudeTask
 * to find the current height and the desired height
 */
-void Motor_PIController(double delta_t);
+uint32_t calculateMotorDuty(HeightStructure_t heightInput, double integratedHeightError);
 
 
 /**
  *  Initializing Motor PWM
  *  Motor uses M0PWM7 (j4-05) as referred in Table1 TIVA MCU I/O data signals
  */
-uint8_t motorTaskInit(void);
+uint8_t motorInit(void);
 
 
 #endif /* DRIVERS_MOTOR_H_ */
