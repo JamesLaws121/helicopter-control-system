@@ -36,6 +36,17 @@
 
 TimerHandle_t PWMTimer;
 
+
+/*
+ * Struct for storing motor duty and the integrated heigh error
+ */
+typedef struct PWMStructure {
+    double integratedHeightError;
+    int32_t mainDuty;
+} PWMStructure_t;
+
+
+
 /**
 * Function to set the Period and duty cycle of main motor
 */
@@ -46,7 +57,7 @@ void setPWM(uint32_t ui32Freq, uint32_t ui32Duty);
 * Calculates the duty for the motor. Uses the AltitudeTask
 * to find the current height and the desired height
 */
-uint32_t calculateMotorDuty(HeightStructure_t heightInput, double integratedHeightError);
+PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integratedHeightError);
 
 
 /**

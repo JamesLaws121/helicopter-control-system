@@ -68,13 +68,14 @@ QueueHandle_t getHeightOutputQueue(void) {
 **/
 static void heightOuputTask(void *pvParameters) {
 
-    uint32_t motorDuty;
-
     HeightStructure_t heightOutput;
     heightOutput.currentHeight = 0;
     heightOutput.desiredHeight = 0;
 
-    double integratedHeightError = 0;
+
+    PWMStructure_t heightData;
+    heightData.integratedHeightError = 0;
+    heightData.mainDuty = 0;
 
     while(1)
     {
@@ -88,10 +89,10 @@ static void heightOuputTask(void *pvParameters) {
         }
 
         // Calculate the duty cycle required
-        motorDuty = calculateMotorDuty(heightOutput, integratedHeightError);
+        heightData = calculateMotorDuty(heightOutput, heightData.integratedHeightError);
 
         // Set the duty cycle required
-        setPWM(INITIAL_PWM_FREQ, motorDuty);
+        setPWM(INITIAL_PWM_FREQ, heightData.mainDuty);
 
 
 

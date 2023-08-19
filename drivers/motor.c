@@ -94,16 +94,17 @@ void setPWM(uint32_t ui32Freq, uint32_t ui32Duty)
 * Calculates the duty for the motor. Uses the AltitudeTask
 * to find the current height and the desired height
 */
-uint32_t calculateMotorDuty(HeightStructure_t heightInput, double integratedHeightError )
+PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integratedHeightError )
 {
-    double heightError;                                    // The altitude error
+    PWMStructure_t heightData;
+    double heightError;                           // The altitude error
 
     // The PI controller gains for the main rotor
     double kpHeight = MOTOR_KP;                         // Proportional Gain
     double kiHeight = MOTOR_KI;                         // Integral Gains
 
     // Error calc for height
-    heightError = 0 - heightInput.currentHeight;    // Height Error
+    heightError = heightInput.desiredHeight - heightInput.currentHeight;    // Height Error
 
     // Need to cap the errors to avoid overshooting the target (controller patch)
     if (heightError >= MAX_ERROR)
@@ -116,7 +117,7 @@ uint32_t calculateMotorDuty(HeightStructure_t heightInput, double integratedHeig
         heightError = MIN_ERROR;
     }
 
-     integratedHeightError += heightError * heightInput.desiredHeight;            // Integral Height Error
+    heightData.integratedHeightError = integratedHeightError + heightError * DELTA_T;            // Integral Height Error
 
      // Recored previous height error for the integral error
      // previousHeightError = heightError;
@@ -128,18 +129,20 @@ uint32_t calculateMotorDuty(HeightStructure_t heightInput, double integratedHeig
     // Specified limits given from the lecture
     if (mainDuty > MAX_PWM)
     {
-        return MAX_PWM;                       // Set the duty cycle ceiling
+        heightData.mainDuty = MAX_PWM; // Set the duty cycle ceiling
     }
 
     else if (mainDuty < MIN_PWM)
     {
-        return MIN_PWM;                       // Set the duty cycle floor
+        heightData.mainDuty = MIN_PWM;                       // Set the duty cycle floor
     }
 
     else
     {
-        return mainDuty;
+        heightData.mainDuty = mainDuty;
     }
+
+    return heightData;
 }
 
 
