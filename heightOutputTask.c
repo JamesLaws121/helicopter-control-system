@@ -40,7 +40,7 @@
 /**
 * The stack size for the heightOuput task
 **/
-#define HEIGHT_OUTPUT_TASK_STACK_SIZE    128         // Stack size in words
+#define HEIGHT_OUTPUT_TASK_STACK_SIZE    256         // Stack size in words
 
 /**
 *The item size and queue size for the height output queue.
