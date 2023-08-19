@@ -134,20 +134,36 @@ uint8_t heightControllerInit(void) {
 }
 
 uint16_t calculateNewHeight(uint16_t currentHeight, uint8_t buttonInputMessage) {
-    if (buttonInputMessage == 16 && currentHeight > 0) {
+    if (buttonInputMessage == 16 && currentHeight > 10) {
         return currentHeight - 10;
-    } else if (buttonInputMessage == 1 && currentHeight < 2000) {
+    } else if (buttonInputMessage == 1 && currentHeight < 1990) {
         return currentHeight + 10;
     } else {
-        return 0;
+        return currentHeight;
     }
 }
 
-void calculateNewHeightTest(void) {
+void calculateNewHeightTest(uint16_t currentHeight) {
     /*
      * Black box testing new height calculation
      */
 
-    UARTprintf("Test 1 result, %s\n", calculateNewHeight(5, 1) != 0 ? "PASS" : "FAIL");
-    calculateNewHeight(50, 1);
+    //16 for left, 1 for right
+
+    UARTprintf("\n\n--------------\n");
+    UARTprintf("Height calculation tests\n\n");
+
+    //Wrong button number
+    UARTprintf("Test 1 result, %s\n", calculateNewHeight(5, 10) == 5 ? "PASS" : "FAIL"); //Won't increase height
+
+    //Valid
+    UARTprintf("Test 2 result, %s\n", calculateNewHeight(5, 1) != 5 ? "PASS" : "FAIL"); //Will
+    UARTprintf("Test 3 result, %s\n", calculateNewHeight(25, 16) != 25 ? "PASS" : "FAIL"); //Will
+    UARTprintf("Test 4 result, %s\n", calculateNewHeight(502, 1) != 502 ? "PASS" : "FAIL"); //Will
+    UARTprintf("Test 5 result, %s\n", calculateNewHeight(1950, 16) != 1950 ? "PASS" : "FAIL"); //Will
+    UARTprintf("Test 6 result, %s\n", calculateNewHeight(1950, 16) != 1995 ? "PASS" : "FAIL"); //Will
+
+    //Invalid
+    UARTprintf("Test 7 result, %s\n", calculateNewHeight(5, 16) == 5 ? "PASS" : "FAIL");
+    UARTprintf("Test 8 result, %s\n", calculateNewHeight(1995, 1) == 1995 ? "PASS" : "FAIL");
 }

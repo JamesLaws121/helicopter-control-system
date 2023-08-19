@@ -26,7 +26,7 @@ typedef struct HeightStructure {
 
 
 uint16_t calculateNewHeight(uint16_t currentHeight, uint8_t buttonInputMessage);
-void calculateNewHeightTest(void);
+void calculateNewHeightTest(uint16_t currentHeight);
 
 
 #endif /* HEIGHTCONTROLLER_H_ */
