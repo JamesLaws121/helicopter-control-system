@@ -76,13 +76,8 @@ static void heightControllerTask(void *pvParameters) {
             // Update height based on button buttonInput
             UARTprintf("\n BUTTON: %d", buttonInputMessage); //16 for left, 1 for right
 
-            if (buttonInputMessage == 16 && heightOutputMessage.currentHeight > 0) {
-                heightOutputMessage.desiredHeight -= 10;
-            } else if (buttonInputMessage == 1 && heightOutputMessage.currentHeight < 2000) {
-                heightOutputMessage.desiredHeight += 10;
-            }
+            heightOutputMessage.desiredHeight = calculateNewHeight(heightOutputMessage.currentHeight, buttonInputMessage);
         }
-
 
         // Reads the altitude input and updates output accordingly
         QueueHandle_t altitudeInputQueue = getAltitudeInputQueue();
@@ -112,10 +107,6 @@ static void heightControllerTask(void *pvParameters) {
 
         }
 
-
-
-
-
         xSemaphoreGive(UARTSemaphore);
     }
 }
@@ -142,4 +133,21 @@ uint8_t heightControllerInit(void) {
     return 0;
 }
 
+uint16_t calculateNewHeight(uint16_t currentHeight, uint8_t buttonInputMessage) {
+    if (buttonInputMessage == 16 && currentHeight > 0) {
+        return currentHeight - 10;
+    } else if (buttonInputMessage == 1 && currentHeight < 2000) {
+        return currentHeight + 10;
+    } else {
+        return 0;
+    }
+}
 
+void calculateNewHeightTest(void) {
+    /*
+     * Black box testing new height calculation
+     */
+
+    UARTprintf("Test 1 result, %s\n", calculateNewHeight(5, 1) != 0 ? "PASS" : "FAIL");
+    calculateNewHeight(50, 1);
+}
