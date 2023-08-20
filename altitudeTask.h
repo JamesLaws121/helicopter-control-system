@@ -6,7 +6,6 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 
-
 #ifndef ALTITUDETASK_H_
 #define ALTITUDETASK_H_
 
