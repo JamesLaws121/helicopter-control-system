@@ -2,7 +2,7 @@
  * HeightController.c
  *
  *  Created on: 2/08/2023
- *      Author: James Laws
+ *      Author: James Laws, Ben
  */
 
 #include <stdbool.h>
@@ -133,10 +133,10 @@ uint8_t heightControllerInit(void) {
     return 0;
 }
 
-uint16_t calculateNewHeight(uint16_t currentHeight, uint8_t buttonInputMessage) {
-    if (buttonInputMessage == 16 && currentHeight >= 10) {
+int calculateNewHeight(int currentHeight, uint8_t buttonInputMessage) {
+    if (buttonInputMessage == 16 && currentHeight >= 10 && currentHeight <= 2000) {
         return currentHeight - 10;
-    } else if (buttonInputMessage == 1 && currentHeight <= 1990) {
+    } else if (buttonInputMessage == 1 && currentHeight >= 0 && currentHeight <= 1990) {
         return currentHeight + 10;
     } else {
         return currentHeight;
@@ -165,4 +165,6 @@ void calculateNewHeightTest(uint16_t currentHeight) {
     //Invalid height numbers
     UARTprintf("Test 7 result, %s\n", calculateNewHeight(5, 16) == 5 ? "PASS" : "FAIL");
     UARTprintf("Test 8 result, %s\n", calculateNewHeight(1995, 1) == 1995 ? "PASS" : "FAIL");
+    UARTprintf("Test 9 result, %s\n", calculateNewHeight(-500, 16) == -500 ? "PASS" : "FAIL");
+    UARTprintf("Test 10 result, %s\n", calculateNewHeight(-5, 1) == -5 ? "PASS" : "FAIL");
 }
