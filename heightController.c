@@ -57,7 +57,7 @@ static void heightControllerTask(void *pvParameters) {
     * This is the current height set by the user
     **/
 
-    uint8_t changeInState = 0;
+    uint8_t changeInState = 1;
     uint16_t newHeight = 0;
 
     uint8_t buttonInputMessage;

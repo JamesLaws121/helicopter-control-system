@@ -17,11 +17,11 @@
 #include "driverlib/systick.h"
 #include "driverlib/gpio.h"
 #include "driverlib/rom.h"
+#include "driverlib/pin_map.h"
 #include "driverlib/pwm.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
 
-#include "drivers/pin_map.h"
 #include "drivers/buttons.h"
 #include "drivers/motor.h"
 #include "drivers/uartstdio.h"
