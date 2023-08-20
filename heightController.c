@@ -61,7 +61,7 @@ static void heightControllerTask(void *pvParameters) {
     heightOutputMessage.desiredHeight = 0;
 
 
-    int8_t groundVoltage = -1;
+    int32_t groundVoltage = -1;
 
     while(1)
     {
@@ -78,6 +78,7 @@ static void heightControllerTask(void *pvParameters) {
             UARTprintf("\n BUTTON: %d", buttonInputMessage); //16 for left, 1 for right
 
             heightOutputMessage.desiredHeight = calculateNewHeight(heightOutputMessage.currentHeight, buttonInputMessage);
+
         }
 
         // Reads the altitude input and updates output accordingly
@@ -86,7 +87,6 @@ static void heightControllerTask(void *pvParameters) {
         if (xQueueReceive(altitudeInputQueue, &altitudeInputMessage, 0) == pdPASS) {
             // Calculate roter output to get to wanted altitude
             UARTprintf("\n READ FROM ALTITUDE QUEUE\n RESULT: %d",altitudeInputMessage);
-            heightOutputMessage.currentHeight = altitudeInputMessage/10;
 
             // Calibrate ground voltage
             if (groundVoltage == -1) {
@@ -98,10 +98,11 @@ static void heightControllerTask(void *pvParameters) {
                     UARTprintf("\nERROR: calibration queue full. This should never happen.\n");
                 }
             } else {
+                heightOutputMessage.currentHeight = altitudeInputMessage - groundVoltage;
                 // Write to output queue
                 UARTprintf("\n Send data to height output\n");
                 QueueHandle_t heightOutputQueue = getHeightOutputQueue();
-                if(xQueueOverwrite(heightOutputQueue, &heightOutputMessage) != pdPASS) {
+                if(xQueueSendToBack(heightOutputQueue, &heightOutputMessage, 5) != pdPASS) {
                     UARTprintf("\nERROR: height output queue full. This should never happen.\n");
                 }
             }
