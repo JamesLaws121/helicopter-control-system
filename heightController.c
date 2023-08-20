@@ -7,23 +7,18 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "inc/hw_memmap.h"
-//#include "inc/hw_types.h"
-#include "driverlib/gpio.h"
-#include "driverlib/rom.h"
-
-#include "drivers/buttons.h"
-#include "drivers/uartstdio.h"
 #include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
+#include "inc/hw_memmap.h"
 
-#include "config.h"
+#include "altitudeTask.h"
 #include "buttonTask.h"
+#include "config.h"
+#include "drivers/uartstdio.h"
 #include "heightOutputTask.h"
 #include "heightController.h"
-#include "altitudeTask.h"
+#include "queue.h"
+#include "semphr.h"
+#include "task.h"
 
  /**
  *The item size and queue size for the calibration queue.
