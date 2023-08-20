@@ -60,14 +60,16 @@ static void heightControllerTask(void *pvParameters) {
     heightOutputMessage.desiredHeight = 0;
 
 
-    int32_t groundVoltage = -1;
+    uint32_t groundVoltage = 0;
+
+    uint8_t calibrationCountdown = 4;
 
     while(1)
     {
         vTaskDelay(pdMS_TO_TICKS(FREQUENCY_HEIGHT_CONTROLLER_TASK));
         xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
 
-        UARTprintf("\n\nHeight Controller Task");
+        //UARTprintf("\n\nHeight Controller Task");
 
 
         // Read the next button input, if available on queue.
@@ -92,16 +94,22 @@ static void heightControllerTask(void *pvParameters) {
             UARTprintf("\n READ FROM ALTITUDE QUEUE\n RESULT: %d",altitudeInputMessage);
 
             // Calibrate ground voltage
-            if (groundVoltage == -1) {
-                UARTprintf("\n Setting ground voltage.\n");
-                groundVoltage = altitudeInputMessage;
-
-                uint8_t calibrationMessage = 1;
-                if(xQueueSendToBack(calibrationQueue, &calibrationMessage , 5) != pdPASS) {
-                    UARTprintf("\nERROR: calibration queue full. This should never happen.\n");
+            if (calibrationCountdown != 0) {
+                calibrationCountdown -= 1;
+                if (calibrationCountdown == 3) {
+                    UARTprintf("\n Skipping first input \n");
+                } else {
+                    UARTprintf("\n Calculating ground voltage. %d\n", groundVoltage);
+                    groundVoltage = groundVoltage==0? altitudeInputMessage: (groundVoltage + altitudeInputMessage)/2;
+                    UARTprintf("\n Calculating ground voltage. %d\n", groundVoltage);
                 }
+
+
             } else {
-                heightOutputMessage.currentHeight = altitudeInputMessage - groundVoltage;
+                uint8_t calibrationMessage = 1;
+                xQueueOverwrite(calibrationQueue, &calibrationMessage);
+
+                heightOutputMessage.currentHeight = (altitudeInputMessage > groundVoltage) ? 0 : groundVoltage - altitudeInputMessage;
                 // Write to output queue
                 UARTprintf("\n Send data to height output\n");
                 QueueHandle_t heightOutputQueue = getHeightOutputQueue();

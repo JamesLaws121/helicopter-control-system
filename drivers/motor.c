@@ -53,7 +53,7 @@
 #define GPIO_PWM_MOTOR_PIN          GPIO_PIN_5
 #define PDMS_TO_TICKS               20
 #define PERCENT                     100
-#define DELTA_T                      0.1
+#define DELTA_T                      0.1 // Used for calculating the integrated height error
 #define PWM_DIVIDER                 4
 
 /**
@@ -62,9 +62,9 @@
 #define PWM_DUTY_FIXED              67
 
 #define MAX_PWM                     85
-#define MIN_PWM                     15
-#define MOTOR_CONSTANT              15
-#define MOTOR_KP                    0.45
+#define MIN_PWM                     15             // WHY is this not zero i want my helicopter dropping like a rock
+#define MOTOR_CONSTANT              30
+#define MOTOR_KP                    0.3
 #define MOTOR_KI                    0.0075
 
 
@@ -134,7 +134,7 @@ PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integrat
 
     else if (mainDuty < MIN_PWM)
     {
-        heightData.mainDuty = MIN_PWM;                       // Set the duty cycle floor
+        heightData.mainDuty = MIN_PWM; // Set the duty cycle floor
     }
 
     else
@@ -154,8 +154,8 @@ PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integrat
  */
 uint8_t motorInit(void)
 {
-    SysCtlPeripheralReset (PWM_PERIPH_GPIO); // Used for PWM output
-    SysCtlPeripheralReset (PWM_PERIPH_PWM);  // Main Rotor PWM
+   // SysCtlPeripheralReset (PWM_PERIPH_GPIO); // Used for PWM output
+    //SysCtlPeripheralReset (PWM_PERIPH_PWM);  // Main Rotor PWM
 
     SysCtlPeripheralEnable(PWM_PERIPH_PWM);
     SysCtlPeripheralEnable(PWM_PERIPH_GPIO);
@@ -166,11 +166,14 @@ uint8_t motorInit(void)
     PWMGenConfigure(PWM_MOTOR_GENERATOR, PWM_MAIN_GEN, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
 
     // Initialize parameters for PWM
-    setPWM(INITIAL_PWM_FREQ, PWM_DUTY_FIXED);
+    //setPWM(INITIAL_PWM_FREQ, PWM_DUTY_FIXED);
     PWMGenEnable(PWM_MOTOR_GENERATOR, PWM_MAIN_GEN);
+
+    PWMOutputState(PWM_MOTOR_GENERATOR, PWM_PIN7_BIT, false);
 
     SysCtlPWMClockSet(SYSCTL_PWMDIV_4);
 
+    PWMOutputState(PWM_MOTOR_GENERATOR, PWM_PIN7_BIT, true);
 
     return 0;
 

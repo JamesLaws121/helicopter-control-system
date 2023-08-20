@@ -67,6 +67,8 @@ QueueHandle_t getHeightOutputQueue(void) {
 * This task reads the heightOuputQueue and outputs the desired output
 **/
 static void heightOuputTask(void *pvParameters) {
+    uint8_t calibration_state = 0;
+
 
     HeightStructure_t heightOutput;
     heightOutput.currentHeight = 0;
@@ -77,11 +79,21 @@ static void heightOuputTask(void *pvParameters) {
     heightData.integratedHeightError = 0;
     heightData.mainDuty = 0;
 
+
+    while (calibration_state == 0) {
+        vTaskDelay(pdMS_TO_TICKS(CALIBRATION_FREQUENCY + FREQUENCYY_HEIGHT_OUTPUT_TASK));
+        QueueHandle_t calibrationQueue = getCalibrationQueue();
+        xQueuePeek( calibrationQueue, &calibration_state, 0 );
+    }
+
     while(1)
     {
+
         vTaskDelay(pdMS_TO_TICKS(FREQUENCYY_HEIGHT_OUTPUT_TASK));
+
         xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
         UARTprintf("\n\n Height Output Task");
+
 
         if (xQueueReceive(heightOutputQueue, &heightOutput, 0) == pdPASS) {
             UARTprintf("\n READ FROM Height output QUEUE\n RESULT CURRENT HEIGHT: %d",heightOutput.currentHeight);

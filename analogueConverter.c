@@ -21,7 +21,7 @@
 #include "analogueConverter.h"
 
 // Buffer size
-#define BUF_SIZE 5
+#define BUF_SIZE 10
 
 // Buffer for storing conversion results
 static circBuf_t adcBuffer;
