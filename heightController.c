@@ -28,9 +28,10 @@
  /**
  *The item size and queue size for the calibration queue.
  **/
- #define CALIBRATION_ITEM_SIZE           sizeof(uint8_t)
- #define CALIBRATION_QUEUE_SIZE          1
+#define CALIBRATION_ITEM_SIZE           sizeof(uint8_t)
+#define CALIBRATION_QUEUE_SIZE          1
 
+#define MAX_HEIGHT 1300
 
 /**
 * The stack size for the buttons task
@@ -137,10 +138,10 @@ int calculateNewHeight(int currentHeight, uint8_t buttonInputMessage) {
     /*
      * Calculate height from button input
      */
-    if (buttonInputMessage == 16 && currentHeight >= 130 && currentHeight <= 1300) {
-        return currentHeight - 130;
-    } else if (buttonInputMessage == 1 && currentHeight >= 0 && currentHeight <= 1170) {
-        return currentHeight + 130;
+    if (buttonInputMessage == 16 && currentHeight >= MAX_HEIGHT/10 && currentHeight <= MAX_HEIGHT) {
+        return currentHeight - MAX_HEIGHT/10;
+    } else if (buttonInputMessage == 1 && currentHeight >= 0 && currentHeight <= (MAX_HEIGHT - MAX_HEIGHT/10)) {
+        return currentHeight + MAX_HEIGHT/10;
     } else {
         return currentHeight;
     }
