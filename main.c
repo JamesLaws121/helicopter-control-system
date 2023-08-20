@@ -2,7 +2,7 @@
  * main.c
  *
  *  Created on: 2/08/2023
- *      Authors: James Laws, Ben, AJ, Tom
+ *      Authors: James Laws, Benjamin Stewart, AJ Seville, Thomas Clifton
  */
 
 

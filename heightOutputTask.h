@@ -1,7 +1,10 @@
 /*
  * heightOuputTask.h
- * James Laws
- *  Last modified: 7/08/2023 
+ *
+ *  Created on: 7/08/2023
+ *  Edited on: 12/08/2023
+ *      Author: James Laws
+ *      Editor: AJ Seville
  */
 
 #ifndef HEIGHTOUTPUT_H_

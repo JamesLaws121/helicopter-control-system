@@ -2,7 +2,7 @@
  * uartSetup.c
  *
  *  Created on: 15/08/2023
- *      Author: jla201
+ *      Author: James Laws
  */
 
 
@@ -15,13 +15,8 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
-
-#include "FreeRTOS.h"
 #include "drivers/uartstdio.h"
 
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
 #include "config.h"
 
 

@@ -2,7 +2,7 @@
  * uartSetup.h
  *
  *  Created on: 15/08/2023
- *      Author: jla201
+ *      Author: James Laws
  */
 
 #ifndef UARTSETUP_H_
