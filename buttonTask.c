@@ -5,26 +5,21 @@
  *      Author: James Laws
  */
 
-#include "FreeRTOS.h"
 #include <stdbool.h>
 #include <stdint.h>
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "inc/hw_gpio.h"
 #include "driverlib/gpio.h"
-#include "driverlib/rom.h"
-#include "driverlib/sysctl.h"
-
-#include "drivers/buttons.h"
-#include "drivers/uartstdio.h"
-
-#include "config.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
+#include "FreeRTOS.h"
+#include "inc/hw_memmap.h"
 
 #include "buttonTask.h"
+#include "config.h"
+#include "drivers/buttons.h"
+#include "drivers/uartstdio.h"
 #include "heightController.h"
+#include "queue.h"
+#include "semphr.h"
+#include "task.h"
+
 
  /**
  *The item size and queue size for the button input queue.

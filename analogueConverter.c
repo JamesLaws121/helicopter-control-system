@@ -1,24 +1,21 @@
 /*
  * analogueConverter.c
- * P.J. Bones   UCECE, J. Laws
- * Last modified: 8/Aug/2023
-*/
+ *
+ *  Created on: 19/08/2023
+ *      Author: James Laws, Tom Clifton
+ */
+
 
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "driverlib/adc.h"
+#include "driverlib/sysctl.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
-#include "driverlib/adc.h"
-#include "driverlib/gpio.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/interrupt.h"
-#include "driverlib/debug.h"
-
-#include "drivers/ustdlib.h"
-#include "types/circBufT.h"
 
 #include "analogueConverter.h"
+#include "types/circBufT.h"
 
 // Buffer size
 #define BUF_SIZE 10
