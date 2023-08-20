@@ -2,31 +2,21 @@
  * main.c
  *
  *  Created on: 2/08/2023
- *      Authors: James Laws, Benjamin Stewart, AJ Seville, Thomas Clifton
+ *  Authors: James Laws, Benjamin Stewart, AJ Seville, Thomas Clifton
  */
-
 
 
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "driverlib/gpio.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
+#include "drivers/uartstdio.h"
 
 #include "FreeRTOS.h"
-#include "drivers/uartstdio.h"
-#include "drivers/motor.h"
-
-
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
-
 
 #include "buttonTask.h"
 #include "heightOutputTask.h"

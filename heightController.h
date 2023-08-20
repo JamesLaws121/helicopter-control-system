@@ -1,7 +1,8 @@
 /*
  * heightController.h
- * James Laws
- * Last modified: 2/08/2023 
+ *
+ *  Created on: 2/08/2023
+ *  Authors: James Laws
  */
 
 #include "stdint.h"

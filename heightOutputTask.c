@@ -2,34 +2,21 @@
  * heightOuputTask.c
  *
  *  Created on: 7/08/2023
- *  Edited on: 12/08/2023
- *      Author: James Laws
- *      Editor: AJ Seville
+ *  Authors: James Laws, AJ Seville
  */
 
 
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "driverlib/gpio.h"
-#include "driverlib/rom.h"
-#include "driverlib/pwm.h"
-#include "driverlib/interrupt.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/sysctl.h"
-
-#include "drivers/buttons.h"
-#include "drivers/uartstdio.h"
-#include "drivers/motor.h"
-
 #include "FreeRTOS.h"
 #include "timers.h"
-#include "config.h"
 #include "task.h"
 #include "queue.h"
-#include "semphr.h"
+#include "config.h"
+
+#include "drivers/uartstdio.h"
+#include "drivers/motor.h"
 
 #include "heightController.h"
 #include "heightOutputTask.h"

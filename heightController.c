@@ -1,8 +1,8 @@
 /*
- * HeightController.c
+ * heightController.c
  *
  *  Created on: 2/08/2023
- *      Author: James Laws
+ *  Authors: James Laws
  */
 
 #include <stdbool.h>
