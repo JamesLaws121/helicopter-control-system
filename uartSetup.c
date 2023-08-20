@@ -2,7 +2,7 @@
  * uartSetup.c
  *
  *  Created on: 15/08/2023
- *      Author: James Laws
+ *      Authors: Benjamin Stewar, James Laws
  */
 
 
