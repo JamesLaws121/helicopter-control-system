@@ -64,11 +64,7 @@ static void altitudeTask(void *pvParameters) {
     {
         vTaskDelay(pdMS_TO_TICKS(FREQUENCY_ALTITUDE_TASK));
 
-
         xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
-        //UARTprintf("\n\n Altitude Input Task");
-
-
 
         // Trigger the collection of altitude data
         ADCProcessorTrigger(ADC0_BASE, 3);
@@ -82,9 +78,7 @@ static void altitudeTask(void *pvParameters) {
             if(xQueueSendToBack(altitudeInputQueue, &sampleAverage , 2) != pdPASS) {
                 UARTprintf("\nERROR: Queue full. This should never happen.\n");
             }
-            uint16_t ulValReceived = 0;
-            xQueuePeek( altitudeInputQueue, &ulValReceived, 0 );
-            UARTprintf("\n\nItem sent %d", ulValReceived);
+
         }
         xSemaphoreGive(UARTSemaphore);
         

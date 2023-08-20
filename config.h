@@ -24,10 +24,10 @@
  *  These are purposely prime numbers
  */
 
-#define FREQUENCY_BUTTON_TASK               52
-#define FREQUENCY_HEIGHT_CONTROLLER_TASK    173
+#define FREQUENCY_BUTTON_TASK               51
+#define FREQUENCY_HEIGHT_CONTROLLER_TASK    187
 #define FREQUENCY_ALTITUDE_TASK             213
-#define FREQUENCYY_HEIGHT_OUTPUT_TASK       727
+#define FREQUENCYY_HEIGHT_OUTPUT_TASK       327
 #define CALIBRATION_FREQUENCY               3027
 
 
