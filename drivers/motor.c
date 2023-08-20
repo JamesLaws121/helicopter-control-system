@@ -51,7 +51,7 @@
 #define GPIO_PWM_MOTOR_PIN          GPIO_PIN_5
 #define PDMS_TO_TICKS               20
 #define PERCENT                     100
-#define DELTA_T                      0.1 // Used for calculating the integrated height error
+#define DELTA_T                     0.1 // Used for calculating the integrated height error
 #define PWM_DIVIDER                 4
 
 /**

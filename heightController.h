@@ -11,9 +11,15 @@
 #define HEIGHTCONTROLLER_H_
 
 
+/**
+ * Initializes the Height controller
+ */
 uint8_t heightControllerInit(void);
 
 
+/**
+* Gets the calibration state queue
+**/
 QueueHandle_t getCalibrationQueue(void);
 
 

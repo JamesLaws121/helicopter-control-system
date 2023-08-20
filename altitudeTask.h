@@ -1,7 +1,10 @@
-
 /*
-* altitudeTask.h - prototypes for the altitude task
-*/
+ * altitudeTask.h
+ *
+ *  Created on: 8/08/2023
+ *      Authors: James Laws, Tom Clifton
+ */
+
 
 #include "FreeRTOS.h"
 #include "queue.h"
@@ -17,6 +20,6 @@ extern uint8_t altitudeTaskInit(void);
 /**
 * Gets the altitude input queue
 **/
-extern QueueHandle_t getAltitudeInputQueue();
+extern QueueHandle_t getAltitudeInputQueue(void);
 
 #endif // ALTITUDETASK_H_

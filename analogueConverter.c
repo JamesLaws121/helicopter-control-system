@@ -1,8 +1,8 @@
 /*
  * analogueConverter.c
  *
- *  Created on: 19/08/2023
- *      Author: James Laws, Tom Clifton
+ *  Created on: 8/08/2023
+ *      Authors: P.J. Bones UCECE, Tom Clifton, James Laws
  */
 
 

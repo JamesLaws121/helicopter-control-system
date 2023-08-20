@@ -25,7 +25,7 @@
 
 
 /**
-* The stack size for the heightOuput task
+* The stack size for the heightOutput task
 **/
 #define HEIGHT_OUTPUT_TASK_STACK_SIZE    256         // Stack size in words
 
@@ -36,7 +36,7 @@
 #define HEIGHT_OUTPUT_QUEUE_SIZE          1
 
 /**
-* The queue that holds button inputs
+* The queue that holds height outputs
 **/
 QueueHandle_t heightOutputQueue;
 
@@ -53,7 +53,7 @@ QueueHandle_t getHeightOutputQueue(void) {
 /**
 * This task reads the heightOuputQueue and outputs the desired output
 **/
-static void heightOuputTask(void *pvParameters) {
+static void heightOutputTask(void *pvParameters) {
     uint8_t calibration_state = 0;
 
 
@@ -96,7 +96,7 @@ uint8_t heightOutputTaskInit(void)
 {
 
     /*
-    * Initializes motor
+    * Initializes the pwm motor
     */
     if(motorInit() != 0)
     {
@@ -107,16 +107,16 @@ uint8_t heightOutputTaskInit(void)
     heightOutputQueue = xQueueCreate(HEIGHT_OUTPUT_QUEUE_SIZE, HEIGHT_OUTPUT_ITEM_SIZE);
 
     /*
-    * Create the heightOuput task.
+    * Create the heightOutput task.
     */
-    if(pdTRUE != xTaskCreate(heightOuputTask, "heightOuputTask", HEIGHT_OUTPUT_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY +
+    if(pdTRUE != xTaskCreate(heightOutputTask, "heightOuputTask", HEIGHT_OUTPUT_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY +
                    PRIORITY_HEIGHT_OUTPUT_TASK, NULL))
     {
         return 1; // error creating task, out of memory?
     }
 
     // Success.
-    return(0);
+    return 0;
 }
 
 

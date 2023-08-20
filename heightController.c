@@ -27,13 +27,23 @@
  #define CALIBRATION_QUEUE_SIZE          1
 
 
+#define MAX_HEIGHT 1300
+
 /**
 * The stack size for the buttons task
 **/
 #define HEIGHT_TASK_STACK_SIZE    128         // Stack size in words
 
+
+/**
+* The queue that holds the calibration state
+**/
 QueueHandle_t calibrationQueue;
 
+
+/**
+* Gets the calibration state queue
+**/
 QueueHandle_t getCalibrationQueue(void) {
     return calibrationQueue;
 }
@@ -73,9 +83,9 @@ static void heightControllerTask(void *pvParameters) {
         while(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
 
             if (buttonInputMessage == 16 && heightStatus.currentHeight > 0) {
-                heightStatus.desiredHeight -= 130;
-            } else if (buttonInputMessage == 1 && heightStatus.desiredHeight < 1300) {
-                heightStatus.desiredHeight += 130;
+                heightStatus.desiredHeight -= MAX_HEIGHT/10;
+            } else if (buttonInputMessage == 1 && heightStatus.desiredHeight < MAX_HEIGHT) {
+                heightStatus.desiredHeight += MAX_HEIGHT/10;
             }
             changeInState = 1;
         }
@@ -118,12 +128,15 @@ static void heightControllerTask(void *pvParameters) {
         }
 
 
+        /**
+         * Displays current height and altitude data to the user
+         */
         if (changeInState == 1 && calibrationCountdown == 0) {
             changeInState = 0;
             UARTprintf("\n CURRENT HEIGHT: %d mv",heightStatus.currentHeight);
             UARTprintf("\n DESIRED HEIGHT: %d mv",heightStatus.desiredHeight);
-            UARTprintf("\n CURRENT HEIGHT PERCENTAGE: %d %%",(heightStatus.currentHeight)/13);
-            UARTprintf("\n DESIRED HEIGHT PERCENTAGE: %d %% \n",(heightStatus.desiredHeight)/13);
+            UARTprintf("\n CURRENT HEIGHT PERCENTAGE: %d %%",(heightStatus.currentHeight)/(MAX_HEIGHT/100));
+            UARTprintf("\n DESIRED HEIGHT PERCENTAGE: %d %% \n",(heightStatus.desiredHeight)/(MAX_HEIGHT/100));
         }
 
 
@@ -142,12 +155,12 @@ uint8_t heightControllerInit(void) {
     calibrationQueue = xQueueCreate(CALIBRATION_QUEUE_SIZE, CALIBRATION_ITEM_SIZE);
 
     /*
-    * Create the buttons task.
+    * Create the height controller task.
     */
     if(pdTRUE !=  xTaskCreate(heightControllerTask, "heightControllerTask", HEIGHT_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY +
                    PRIORITY_HEIGHT_CONTROLLER_TASK, NULL))
     {
-        return(1); // error creating task, out of memory?
+        return 1; // error creating task, out of memory?
     }
 
     return 0;

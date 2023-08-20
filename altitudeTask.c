@@ -1,8 +1,8 @@
 /*
  * altitudeTask.c
  *
- *  Created on: 19/08/2023
- *      Author: James Laws, Tom Clifton
+ *  Created on: 8/08/2023
+ *      Authors: James Laws, Tom Clifton
  */
 
 #include <stdbool.h>
@@ -21,7 +21,7 @@
 #include "task.h"
 
 /**
-* The stack size for the buttons task
+* The stack size for the altitude input task
 **/
 #define ALTITUDE_TASK_STACK_SIZE    128         // Stack size in words
 
@@ -39,7 +39,7 @@
 
 
 /**
-* The queue that holds button inputs
+* The queue that holds altitude inputs
 **/
 QueueHandle_t altitudeInputQueue;
 
