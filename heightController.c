@@ -120,13 +120,11 @@ static void heightControllerTask(void *pvParameters) {
 
         if (changeInState == 1 && calibrationCountdown == 0) {
             changeInState = 0;
-            UARTprintf("\n CURRENT HEIGHT: %d",heightStatus.currentHeight);
-            UARTprintf("\n DESIRED HEIGHT: %d",heightStatus.desiredHeight);
-            UARTprintf("\n CURRENT HEIGHT PERCENTAGE: %d",(heightStatus.currentHeight)/13);
-            UARTprintf("\n DESIRED HEIGHT PERCENTAGE: %d \n",(heightStatus.desiredHeight)/13);
+            UARTprintf("\n CURRENT HEIGHT: %d mv",heightStatus.currentHeight);
+            UARTprintf("\n DESIRED HEIGHT: %d mv",heightStatus.desiredHeight);
+            UARTprintf("\n CURRENT HEIGHT PERCENTAGE: %d %%",(heightStatus.currentHeight)/13);
+            UARTprintf("\n DESIRED HEIGHT PERCENTAGE: %d %% \n",(heightStatus.desiredHeight)/13);
         }
-
-
 
 
         xSemaphoreGive(UARTSemaphore);

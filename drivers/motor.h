@@ -1,8 +1,8 @@
 /*
- * motor.h
+ * heightOuputTask.h
  *
  *  Created on: 18/08/2023
- *      Author: jla201
+ *  Authors: AJ Seville, James Laaws , Thomas Clifton
  */
 
 #include <stdbool.h>

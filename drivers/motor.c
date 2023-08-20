@@ -1,10 +1,8 @@
 /*
  * heightOuputTask.c
  *
- *  Created on: 12/08/2023
- *  Edited on: 18/08/2023
- *      Editor: AJ Seville
- *      Editor: James Laws
+ *  Created on: 18/08/2023
+ *  Authors: AJ Seville, James Laaws , Thomas Clifton
  */
 
 

@@ -2,7 +2,7 @@
  * buttonTask.c
  *
  *  Created on: 7/08/2023
- *      Author: James Laws
+ *      Authors: Benjamin Stewart, James Laws
  */
 
 #include <stdbool.h>

@@ -1,7 +1,10 @@
 
 /*
-* config.h - config for the various FreeRTOS tasks.
-*/
+*  config.h - config for the various FreeRTOS tasks.
+*
+ *  Created on: 7/08/2023
+ *      Authors: James Laws
+ */
 
 #include "FreeRTOS.h"
 #include "semphr.h"
@@ -21,14 +24,13 @@
 
 /*  The frequencies of the various tasks.
  *  Measured in milliseconds
- *  These are purposely prime numbers
  */
 
-#define FREQUENCY_BUTTON_TASK               21
-#define FREQUENCY_HEIGHT_CONTROLLER_TASK    31
-#define FREQUENCY_ALTITUDE_TASK             53
-#define FREQUENCYY_HEIGHT_OUTPUT_TASK       87
-#define CALIBRATION_FREQUENCY               327
+#define FREQUENCY_BUTTON_TASK               23
+#define FREQUENCY_HEIGHT_CONTROLLER_TASK    29
+#define FREQUENCY_ALTITUDE_TASK             37
+#define FREQUENCYY_HEIGHT_OUTPUT_TASK       43
+#define CALIBRATION_FREQUENCY               241
 
 
 // The UART semaphore
