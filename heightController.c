@@ -134,10 +134,10 @@ uint8_t heightControllerInit(void) {
 }
 
 int calculateNewHeight(int currentHeight, uint8_t buttonInputMessage) {
-    if (buttonInputMessage == 16 && currentHeight >= 10 && currentHeight <= 2000) {
-        return currentHeight - 10;
-    } else if (buttonInputMessage == 1 && currentHeight >= 0 && currentHeight <= 1990) {
-        return currentHeight + 10;
+    if (buttonInputMessage == 16 && currentHeight >= 130 && currentHeight <= 1300) {
+        return currentHeight - 130;
+    } else if (buttonInputMessage == 1 && currentHeight >= 0 && currentHeight <= 1170) {
+        return currentHeight + 130;
     } else {
         return currentHeight;
     }
@@ -157,14 +157,12 @@ void calculateNewHeightTest(uint16_t currentHeight) {
 
     //Valid height numbers
     UARTprintf("Test 2 result, %s\n", calculateNewHeight(5, 1) != 5 ? "PASS" : "FAIL"); //Will
-    UARTprintf("Test 3 result, %s\n", calculateNewHeight(25, 16) != 25 ? "PASS" : "FAIL"); //Will
-    UARTprintf("Test 4 result, %s\n", calculateNewHeight(502, 1) != 502 ? "PASS" : "FAIL"); //Will
-    UARTprintf("Test 5 result, %s\n", calculateNewHeight(1950, 16) != 1950 ? "PASS" : "FAIL"); //Will
-    UARTprintf("Test 6 result, %s\n", calculateNewHeight(1950, 16) != 1995 ? "PASS" : "FAIL"); //Will
+    UARTprintf("Test 3 result, %s\n", calculateNewHeight(502, 1) != 502 ? "PASS" : "FAIL"); //Will
+    UARTprintf("Test 4 result, %s\n", calculateNewHeight(1050, 16) != 1050 ? "PASS" : "FAIL"); //Will
 
     //Invalid height numbers
-    UARTprintf("Test 7 result, %s\n", calculateNewHeight(5, 16) == 5 ? "PASS" : "FAIL");
-    UARTprintf("Test 8 result, %s\n", calculateNewHeight(1995, 1) == 1995 ? "PASS" : "FAIL");
-    UARTprintf("Test 9 result, %s\n", calculateNewHeight(-500, 16) == -500 ? "PASS" : "FAIL");
-    UARTprintf("Test 10 result, %s\n", calculateNewHeight(-5, 1) == -5 ? "PASS" : "FAIL");
+    UARTprintf("Test 5 result, %s\n", calculateNewHeight(5, 16) == 5 ? "PASS" : "FAIL");
+    UARTprintf("Test 6 result, %s\n", calculateNewHeight(1290, 1) == 1290 ? "PASS" : "FAIL");
+    UARTprintf("Test 7 result, %s\n", calculateNewHeight(-500, 16) == -500 ? "PASS" : "FAIL");
+    UARTprintf("Test 8 result, %s\n", calculateNewHeight(-5, 1) == -5 ? "PASS" : "FAIL");
 }
