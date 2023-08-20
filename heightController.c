@@ -134,6 +134,9 @@ uint8_t heightControllerInit(void) {
 }
 
 int calculateNewHeight(int currentHeight, uint8_t buttonInputMessage) {
+    /*
+     * Calculate height from button input
+     */
     if (buttonInputMessage == 16 && currentHeight >= 130 && currentHeight <= 1300) {
         return currentHeight - 130;
     } else if (buttonInputMessage == 1 && currentHeight >= 0 && currentHeight <= 1170) {
