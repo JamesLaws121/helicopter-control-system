@@ -45,7 +45,7 @@ int main(void)
 
     UARTprintf("\n\nWelcome to project");
 
-
+    calculateNewHeightTest(0);
 
     /*
     * Create the button task

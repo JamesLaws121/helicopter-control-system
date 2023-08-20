@@ -2,7 +2,7 @@
  * heightController.c
  *
  *  Created on: 2/08/2023
- *  Authors: James Laws
+ *      Author: James Laws, Ben
  */
 
 #include <stdbool.h>
@@ -23,9 +23,10 @@
  /**
  *The item size and queue size for the calibration queue.
  **/
- #define CALIBRATION_ITEM_SIZE           sizeof(uint8_t)
- #define CALIBRATION_QUEUE_SIZE          1
+#define CALIBRATION_ITEM_SIZE           sizeof(uint8_t)
+#define CALIBRATION_QUEUE_SIZE          1
 
+#define MAX_HEIGHT 1300
 
 #define MAX_HEIGHT 1300
 
@@ -81,15 +82,8 @@ static void heightControllerTask(void *pvParameters) {
         // Read and adjust height based on all button inputs, if any available on queue.
         QueueHandle_t buttonInputQueue = getButtonInputQueue();
         while(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
-
-            if (buttonInputMessage == 16 && heightStatus.currentHeight > 0) {
-                heightStatus.desiredHeight -= MAX_HEIGHT/10;
-            } else if (buttonInputMessage == 1 && heightStatus.desiredHeight < MAX_HEIGHT) {
-                heightStatus.desiredHeight += MAX_HEIGHT/10;
-            }
-            changeInState = 1;
+            heightOutputMessage.desiredHeight = calculateNewHeight(heightOutputMessage.currentHeight, buttonInputMessage);
         }
-
 
         // Reads the altitude input and updates output accordingly
         QueueHandle_t altitudeInputQueue = getAltitudeInputQueue();
@@ -139,7 +133,6 @@ static void heightControllerTask(void *pvParameters) {
             UARTprintf("\n DESIRED HEIGHT PERCENTAGE: %d %% \n",(heightStatus.desiredHeight)/(MAX_HEIGHT/100));
         }
 
-
         xSemaphoreGive(UARTSemaphore);
     }
 }
@@ -166,4 +159,39 @@ uint8_t heightControllerInit(void) {
     return 0;
 }
 
+int calculateNewHeight(int currentHeight, uint8_t buttonInputMessage) {
+    /*
+     * Calculate height from button input
+     */
+    if (buttonInputMessage == 16 && currentHeight >= MAX_HEIGHT/10 && currentHeight <= MAX_HEIGHT) {
+        return currentHeight - MAX_HEIGHT/10;
+    } else if (buttonInputMessage == 1 && currentHeight >= 0 && currentHeight <= (MAX_HEIGHT - MAX_HEIGHT/10)) {
+        return currentHeight + MAX_HEIGHT/10;
+    } else {
+        return currentHeight;
+    }
+}
 
+void calculateNewHeightTest(uint16_t currentHeight) {
+    /*
+     * Black box testing new height calculation
+     */
+
+    //16 for left, 1 for right
+    UARTprintf("\n\n--------------\n");
+    UARTprintf("Height calculation tests\n\n");
+
+    //Wrong button number
+    UARTprintf("Test 1 result, %s\n", calculateNewHeight(5, 10) == 5 ? "PASS" : "FAIL"); //Won't increase height
+
+    //Valid height numbers
+    UARTprintf("Test 2 result, %s\n", calculateNewHeight(5, 1) != 5 ? "PASS" : "FAIL"); //Will
+    UARTprintf("Test 3 result, %s\n", calculateNewHeight(502, 1) != 502 ? "PASS" : "FAIL"); //Will
+    UARTprintf("Test 4 result, %s\n", calculateNewHeight(1050, 16) != 1050 ? "PASS" : "FAIL"); //Will
+
+    //Invalid height numbers
+    UARTprintf("Test 5 result, %s\n", calculateNewHeight(5, 16) == 5 ? "PASS" : "FAIL");
+    UARTprintf("Test 6 result, %s\n", calculateNewHeight(1290, 1) == 1290 ? "PASS" : "FAIL");
+    UARTprintf("Test 7 result, %s\n", calculateNewHeight(-500, 16) == -500 ? "PASS" : "FAIL");
+    UARTprintf("Test 8 result, %s\n", calculateNewHeight(-5, 1) == -5 ? "PASS" : "FAIL");
+}
