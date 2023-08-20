@@ -23,12 +23,12 @@
 /**
 * The stack size for the buttons task
 **/
-#define ALTITUDE_TASK_STACK_SIZE    32         // Stack size in words
+#define ALTITUDE_TASK_STACK_SIZE    128         // Stack size in words
 
 /**
 * The number of samples to trigger before updating the controller
 **/
-#define SAMPLE_COUNT    5
+#define SAMPLE_COUNT    10
 
 
 /**

@@ -82,7 +82,7 @@ uint8_t initADC(void)
 * Calculates and return the rounded mean of the buffer contents
 */
 uint16_t getBufferMean(void){
-    uint32_t sum = 0;
+    uint16_t sum = 0;
     uint8_t i;
     for (i = 0; i < BUF_SIZE; i++)
         sum = sum + readCircBuf(&adcBuffer);

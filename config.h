@@ -24,11 +24,11 @@
  *  These are purposely prime numbers
  */
 
-#define FREQUENCY_BUTTON_TASK               51
-#define FREQUENCY_HEIGHT_CONTROLLER_TASK    187
-#define FREQUENCY_ALTITUDE_TASK             213
-#define FREQUENCYY_HEIGHT_OUTPUT_TASK       327
-#define CALIBRATION_FREQUENCY               3027
+#define FREQUENCY_BUTTON_TASK               21
+#define FREQUENCY_HEIGHT_CONTROLLER_TASK    31
+#define FREQUENCY_ALTITUDE_TASK             53
+#define FREQUENCYY_HEIGHT_OUTPUT_TASK       87
+#define CALIBRATION_FREQUENCY               327
 
 
 // The UART semaphore

@@ -73,9 +73,9 @@ static void heightControllerTask(void *pvParameters) {
         while(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
 
             if (buttonInputMessage == 16 && heightStatus.currentHeight > 0) {
-                heightStatus.desiredHeight -= 10;
-            } else if (buttonInputMessage == 1) {
-                heightStatus.desiredHeight += 10;
+                heightStatus.desiredHeight -= 130;
+            } else if (buttonInputMessage == 1 && heightStatus.desiredHeight < 1300) {
+                heightStatus.desiredHeight += 130;
             }
             changeInState = 1;
         }
@@ -121,7 +121,9 @@ static void heightControllerTask(void *pvParameters) {
         if (changeInState == 1 && calibrationCountdown == 0) {
             changeInState = 0;
             UARTprintf("\n CURRENT HEIGHT: %d",heightStatus.currentHeight);
-            UARTprintf("\n DESIRED HEIGHT: %d \n",heightStatus.desiredHeight);
+            UARTprintf("\n DESIRED HEIGHT: %d",heightStatus.desiredHeight);
+            UARTprintf("\n CURRENT HEIGHT PERCENTAGE: %d",(heightStatus.currentHeight)/13);
+            UARTprintf("\n DESIRED HEIGHT PERCENTAGE: %d \n",(heightStatus.desiredHeight)/13);
         }
 
 

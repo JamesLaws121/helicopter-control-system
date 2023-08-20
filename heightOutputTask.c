@@ -78,14 +78,13 @@ static void heightOuputTask(void *pvParameters) {
 
         vTaskDelay(pdMS_TO_TICKS(FREQUENCYY_HEIGHT_OUTPUT_TASK));
 
-        xQueueReceive(heightOutputQueue, &heightOutput, 0);
+        if (xQueueReceive(heightOutputQueue, &heightOutput, 0) == pdPASS) {
+            // Calculate the duty cycle required
+            heightData = calculateMotorDuty(heightOutput, heightData.integratedHeightError);
 
-        // Calculate the duty cycle required
-        heightData = calculateMotorDuty(heightOutput, heightData.integratedHeightError);
-
-        // Set the duty cycle required
-        setPWM(INITIAL_PWM_FREQ, heightData.mainDuty);
-
+            // Set the duty cycle required
+            setPWM(INITIAL_PWM_FREQ, heightData.mainDuty);
+        }
     }
 }
 

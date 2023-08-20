@@ -62,10 +62,10 @@
 #define PWM_DUTY_FIXED              67
 
 #define MAX_PWM                     85
-#define MIN_PWM                     15             // WHY is this not zero i want my helicopter dropping like a rock
+#define MIN_PWM                     15
 #define MOTOR_CONSTANT              30
-#define MOTOR_KP                    0.3
-#define MOTOR_KI                    0.0075
+#define MOTOR_KP                    1.5
+#define MOTOR_KI                    0.0065
 
 
 #define MAX_ERROR                   20
@@ -106,6 +106,7 @@ PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integrat
     // Error calc for height
     heightError = heightInput.desiredHeight - heightInput.currentHeight;    // Height Error
 
+
     // Need to cap the errors to avoid overshooting the target (controller patch)
     if (heightError >= MAX_ERROR)
     {
@@ -124,7 +125,7 @@ PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integrat
 
 
     // Calculation of the main rotor's duty cycle
-    int32_t mainDuty = MOTOR_CONSTANT + kpHeight * heightError + kiHeight * integratedHeightError;
+    int32_t mainDuty = MOTOR_CONSTANT + kpHeight * heightError + kiHeight * heightData.integratedHeightError;
 
     // Specified limits given from the lecture
     if (mainDuty > MAX_PWM)
