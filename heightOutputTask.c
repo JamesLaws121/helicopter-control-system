@@ -78,14 +78,7 @@ static void heightOuputTask(void *pvParameters) {
 
         vTaskDelay(pdMS_TO_TICKS(FREQUENCYY_HEIGHT_OUTPUT_TASK));
 
-        xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
-        UARTprintf("\n\n Height Output Task");
-
-
-        if (xQueueReceive(heightOutputQueue, &heightOutput, 0) == pdPASS) {
-            UARTprintf("\n READ FROM Height output QUEUE\n RESULT CURRENT HEIGHT: %d",heightOutput.currentHeight);
-            UARTprintf("\n READ FROM Height output QUEUE\n RESULT DESIRED HEIGHT: %d",heightOutput.desiredHeight);
-        }
+        xQueueReceive(heightOutputQueue, &heightOutput, 0);
 
         // Calculate the duty cycle required
         heightData = calculateMotorDuty(heightOutput, heightData.integratedHeightError);
@@ -93,9 +86,6 @@ static void heightOuputTask(void *pvParameters) {
         // Set the duty cycle required
         setPWM(INITIAL_PWM_FREQ, heightData.mainDuty);
 
-
-
-        xSemaphoreGive(UARTSemaphore);
     }
 }
 
@@ -125,8 +115,6 @@ uint8_t heightOutputTaskInit(void)
     {
         return 1; // error creating task, out of memory?
     }
-
-
 
     // Success.
     return(0);

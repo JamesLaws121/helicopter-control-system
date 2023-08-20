@@ -47,12 +47,14 @@ static void heightControllerTask(void *pvParameters) {
     * This is the current height set by the user
     **/
 
+    uint8_t changeInState = 0;
+
     uint8_t buttonInputMessage;
     uint16_t altitudeInputMessage;
 
-    HeightStructure_t heightOutputMessage;
-    heightOutputMessage.currentHeight = 0;
-    heightOutputMessage.desiredHeight = 0;
+    HeightStructure_t heightStatus;
+    heightStatus.currentHeight = 0;
+    heightStatus.desiredHeight = 0;
 
 
     uint32_t groundVoltage = 0;
@@ -64,20 +66,16 @@ static void heightControllerTask(void *pvParameters) {
         vTaskDelay(pdMS_TO_TICKS(FREQUENCY_HEIGHT_CONTROLLER_TASK));
         xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
 
-        //UARTprintf("\n\nHeight Controller Task");
 
-
-        // Read the next button input, if available on queue.
+        // Read and adjust height based on all button inputs, if any available on queue.
         QueueHandle_t buttonInputQueue = getButtonInputQueue();
-        if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
-            // Update height based on button buttonInput
-            UARTprintf("\n BUTTON: %d", buttonInputMessage); //16 for left, 1 for right
-
-            if (buttonInputMessage == 16 && heightOutputMessage.currentHeight > 0) {
-                heightOutputMessage.desiredHeight -= 10;
+        while(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
+            if (buttonInputMessage == 16 && heightStatus.currentHeight > 0) {
+                heightStatus.desiredHeight -= 10;
             } else if (buttonInputMessage == 1) {
-                heightOutputMessage.desiredHeight += 10;
+                heightStatus.desiredHeight += 10;
             }
+            changeInState = 1;
         }
 
 
@@ -85,36 +83,36 @@ static void heightControllerTask(void *pvParameters) {
         QueueHandle_t altitudeInputQueue = getAltitudeInputQueue();
 
         if (xQueueReceive(altitudeInputQueue, &altitudeInputMessage, 0) == pdPASS) {
-            // Calculate roter output to get to wanted altitude
-            UARTprintf("\n READ FROM ALTITUDE QUEUE\n RESULT: %d",altitudeInputMessage);
 
             // Calibrate ground voltage
             if (calibrationCountdown != 0) {
                 calibrationCountdown -= 1;
-                if (calibrationCountdown == 3) {
-                    UARTprintf("\n Skipping first input \n");
-                } else {
-                    UARTprintf("\n Calculating ground voltage. %d\n", groundVoltage);
+                UARTprintf("\n Calibrating \n");
+
+                if (calibrationCountdown != 3) {
                     groundVoltage = groundVoltage==0? altitudeInputMessage: (groundVoltage + altitudeInputMessage)/2;
-                    UARTprintf("\n Calculating ground voltage. %d\n", groundVoltage);
+                } else if (calibrationCountdown == 0) {
+                    UARTprintf("\n Calibrating Finished \n");
+
+                    uint8_t calibrationMessage = 1;
+                    xQueueOverwrite(calibrationQueue, &calibrationMessage);
                 }
-
-
             } else {
-                uint8_t calibrationMessage = 1;
-                xQueueOverwrite(calibrationQueue, &calibrationMessage);
+                // Calculate current height
+                heightStatus.currentHeight = (altitudeInputMessage > groundVoltage) ? 0 : groundVoltage - altitudeInputMessage;
 
-                heightOutputMessage.currentHeight = (altitudeInputMessage > groundVoltage) ? 0 : groundVoltage - altitudeInputMessage;
                 // Write to output queue
-                UARTprintf("\n Send data to height output\n");
                 QueueHandle_t heightOutputQueue = getHeightOutputQueue();
-                if(xQueueSendToBack(heightOutputQueue, &heightOutputMessage, 5) != pdPASS) {
-                    UARTprintf("\nERROR: height output queue full. This should never happen.\n");
-                }
+                xQueueOverwrite(heightOutputQueue, &heightStatus);
             }
-
+            changeInState = 1;
         }
 
+
+        if (changeInState == 1 && calibrationCountdown == 0) {
+            UARTprintf("\n CURRENT HEIGHT: %d",heightStatus.currentHeight);
+            UARTprintf("\n DESIRED HEIGHT: %d",heightStatus.desiredHeight);
+        }
 
 
 
