@@ -2,34 +2,21 @@
  * heightOuputTask.c
  *
  *  Created on: 7/08/2023
- *  Edited on: 12/08/2023
- *      Author: James Laws
- *      Editor: AJ Seville
+ *  Authors: James Laws, AJ Seville
  */
 
 
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "driverlib/gpio.h"
-#include "driverlib/rom.h"
-#include "driverlib/pwm.h"
-#include "driverlib/interrupt.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/sysctl.h"
-
-#include "drivers/buttons.h"
-#include "drivers/uartstdio.h"
-#include "drivers/motor.h"
-
 #include "FreeRTOS.h"
 #include "timers.h"
-#include "config.h"
 #include "task.h"
 #include "queue.h"
-#include "semphr.h"
+#include "config.h"
+
+#include "drivers/uartstdio.h"
+#include "drivers/motor.h"
 
 #include "heightController.h"
 #include "heightOutputTask.h"
@@ -38,7 +25,7 @@
 
 
 /**
-* The stack size for the heightOuput task
+* The stack size for the heightOutput task
 **/
 #define HEIGHT_OUTPUT_TASK_STACK_SIZE    256         // Stack size in words
 
@@ -49,7 +36,7 @@
 #define HEIGHT_OUTPUT_QUEUE_SIZE          1
 
 /**
-* The queue that holds button inputs
+* The queue that holds height outputs
 **/
 QueueHandle_t heightOutputQueue;
 
@@ -66,7 +53,9 @@ QueueHandle_t getHeightOutputQueue(void) {
 /**
 * This task reads the heightOuputQueue and outputs the desired output
 **/
-static void heightOuputTask(void *pvParameters) {
+static void heightOutputTask(void *pvParameters) {
+    uint8_t calibration_state = 0;
+
 
     HeightStructure_t heightOutput;
     heightOutput.currentHeight = 0;
@@ -77,26 +66,25 @@ static void heightOuputTask(void *pvParameters) {
     heightData.integratedHeightError = 0;
     heightData.mainDuty = 0;
 
+
+    while (calibration_state == 0) {
+        vTaskDelay(pdMS_TO_TICKS(CALIBRATION_FREQUENCY + FREQUENCYY_HEIGHT_OUTPUT_TASK));
+        QueueHandle_t calibrationQueue = getCalibrationQueue();
+        xQueuePeek( calibrationQueue, &calibration_state, 0 );
+    }
+
     while(1)
     {
+
         vTaskDelay(pdMS_TO_TICKS(FREQUENCYY_HEIGHT_OUTPUT_TASK));
-        xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
-        UARTprintf("\n\n Height Output Task");
 
         if (xQueueReceive(heightOutputQueue, &heightOutput, 0) == pdPASS) {
-            UARTprintf("\n READ FROM Height output QUEUE\n RESULT CURRENT HEIGHT: %d",heightOutput.currentHeight);
-            UARTprintf("\n READ FROM Height output QUEUE\n RESULT DESIRED HEIGHT: %d",heightOutput.desiredHeight);
+            // Calculate the duty cycle required
+            heightData = calculateMotorDuty(heightOutput, heightData.integratedHeightError);
+
+            // Set the duty cycle required
+            setPWM(INITIAL_PWM_FREQ, heightData.mainDuty);
         }
-
-        // Calculate the duty cycle required
-        heightData = calculateMotorDuty(heightOutput, heightData.integratedHeightError);
-
-        // Set the duty cycle required
-        setPWM(INITIAL_PWM_FREQ, heightData.mainDuty);
-
-
-
-        xSemaphoreGive(UARTSemaphore);
     }
 }
 
@@ -108,7 +96,7 @@ uint8_t heightOutputTaskInit(void)
 {
 
     /*
-    * Initializes motor
+    * Initializes the pwm motor
     */
     if(motorInit() != 0)
     {
@@ -119,18 +107,16 @@ uint8_t heightOutputTaskInit(void)
     heightOutputQueue = xQueueCreate(HEIGHT_OUTPUT_QUEUE_SIZE, HEIGHT_OUTPUT_ITEM_SIZE);
 
     /*
-    * Create the heightOuput task.
+    * Create the heightOutput task.
     */
-    if(pdTRUE != xTaskCreate(heightOuputTask, "heightOuputTask", HEIGHT_OUTPUT_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY +
+    if(pdTRUE != xTaskCreate(heightOutputTask, "heightOuputTask", HEIGHT_OUTPUT_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY +
                    PRIORITY_HEIGHT_OUTPUT_TASK, NULL))
     {
         return 1; // error creating task, out of memory?
     }
 
-
-
     // Success.
-    return(0);
+    return 0;
 }
 
 

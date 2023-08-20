@@ -2,29 +2,24 @@
  * buttonTask.c
  *
  *  Created on: 7/08/2023
- *      Author: James Laws, Ben
+ *      Authors: Benjamin Stewart, James Laws
  */
 
-#include "FreeRTOS.h"
 #include <stdbool.h>
 #include <stdint.h>
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "inc/hw_gpio.h"
 #include "driverlib/gpio.h"
-#include "driverlib/rom.h"
-#include "driverlib/sysctl.h"
-
-#include "drivers/buttons.h"
-#include "drivers/uartstdio.h"
-
-#include "config.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
+#include "FreeRTOS.h"
+#include "inc/hw_memmap.h"
 
 #include "buttonTask.h"
+#include "config.h"
+#include "drivers/buttons.h"
+#include "drivers/uartstdio.h"
 #include "heightController.h"
+#include "queue.h"
+#include "semphr.h"
+#include "task.h"
+
 
  /**
  *The item size and queue size for the button input queue.
@@ -66,25 +61,15 @@ static void buttonTask(void *pvParameters) {
 
     ui8CurButtonState = ui8PrevButtonState = 0;
 
+    while (calibration_state == 0) {
+        vTaskDelay(pdMS_TO_TICKS(CALIBRATION_FREQUENCY + FREQUENCY_BUTTON_TASK));
+        // Don't take user input until calibration finished
+        QueueHandle_t calibrationQueue = getCalibrationQueue();
+        xQueuePeek( calibrationQueue, &calibration_state, 0 );
+    }
+
     while(1)
     {
-
-        while (calibration_state == 0) {
-            xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
-            vTaskDelay(pdMS_TO_TICKS(CALIBRATION_FREQUENCY));
-            // Don't take user input until calibration finished
-            UARTprintf("\n\n Calibrating");
-            QueueHandle_t calibrationQueue = getCalibrationQueue();
-            xQueuePeek( calibrationQueue, &calibration_state, 0 );
-            if (calibration_state == 1) {
-                UARTprintf("\n\n Finished Calibrating");
-            } else {
-                UARTprintf("\n\n Still Calibrating");
-            }
-            xSemaphoreGive(UARTSemaphore);
-            continue;
-        }
-
 
 
         vTaskDelay(pdMS_TO_TICKS(FREQUENCY_BUTTON_TASK));

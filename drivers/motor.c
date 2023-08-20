@@ -1,10 +1,8 @@
 /*
  * heightOuputTask.c
  *
- *  Created on: 12/08/2023
- *  Edited on: 18/08/2023
- *      Editor: AJ Seville
- *      Editor: James Laws
+ *  Created on: 18/08/2023
+ *  Authors: AJ Seville, James Laaws , Thomas Clifton
  */
 
 
@@ -19,11 +17,11 @@
 #include "driverlib/systick.h"
 #include "driverlib/gpio.h"
 #include "driverlib/rom.h"
+#include "driverlib/pin_map.h"
 #include "driverlib/pwm.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
 
-#include "drivers/pin_map.h"
 #include "drivers/buttons.h"
 #include "drivers/motor.h"
 #include "drivers/uartstdio.h"
@@ -53,7 +51,7 @@
 #define GPIO_PWM_MOTOR_PIN          GPIO_PIN_5
 #define PDMS_TO_TICKS               20
 #define PERCENT                     100
-#define DELTA_T                      0.1
+#define DELTA_T                     0.1 // Used for calculating the integrated height error
 #define PWM_DIVIDER                 4
 
 /**
@@ -63,9 +61,9 @@
 
 #define MAX_PWM                     85
 #define MIN_PWM                     15
-#define MOTOR_CONSTANT              15
-#define MOTOR_KP                    0.45
-#define MOTOR_KI                    0.0075
+#define MOTOR_CONSTANT              30
+#define MOTOR_KP                    1.5
+#define MOTOR_KI                    0.0065
 
 
 #define MAX_ERROR                   20
@@ -106,6 +104,7 @@ PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integrat
     // Error calc for height
     heightError = heightInput.desiredHeight - heightInput.currentHeight;    // Height Error
 
+
     // Need to cap the errors to avoid overshooting the target (controller patch)
     if (heightError >= MAX_ERROR)
     {
@@ -124,7 +123,7 @@ PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integrat
 
 
     // Calculation of the main rotor's duty cycle
-    int32_t mainDuty = MOTOR_CONSTANT + kpHeight * heightError + kiHeight * integratedHeightError;
+    int32_t mainDuty = MOTOR_CONSTANT + kpHeight * heightError + kiHeight * heightData.integratedHeightError;
 
     // Specified limits given from the lecture
     if (mainDuty > MAX_PWM)
@@ -134,7 +133,7 @@ PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integrat
 
     else if (mainDuty < MIN_PWM)
     {
-        heightData.mainDuty = MIN_PWM;                       // Set the duty cycle floor
+        heightData.mainDuty = MIN_PWM; // Set the duty cycle floor
     }
 
     else
@@ -154,8 +153,8 @@ PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integrat
  */
 uint8_t motorInit(void)
 {
-    SysCtlPeripheralReset (PWM_PERIPH_GPIO); // Used for PWM output
-    SysCtlPeripheralReset (PWM_PERIPH_PWM);  // Main Rotor PWM
+   // SysCtlPeripheralReset (PWM_PERIPH_GPIO); // Used for PWM output
+    //SysCtlPeripheralReset (PWM_PERIPH_PWM);  // Main Rotor PWM
 
     SysCtlPeripheralEnable(PWM_PERIPH_PWM);
     SysCtlPeripheralEnable(PWM_PERIPH_GPIO);
@@ -166,11 +165,14 @@ uint8_t motorInit(void)
     PWMGenConfigure(PWM_MOTOR_GENERATOR, PWM_MAIN_GEN, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
 
     // Initialize parameters for PWM
-    setPWM(INITIAL_PWM_FREQ, PWM_DUTY_FIXED);
+    //setPWM(INITIAL_PWM_FREQ, PWM_DUTY_FIXED);
     PWMGenEnable(PWM_MOTOR_GENERATOR, PWM_MAIN_GEN);
+
+    PWMOutputState(PWM_MOTOR_GENERATOR, PWM_PIN7_BIT, false);
 
     SysCtlPWMClockSet(SYSCTL_PWMDIV_4);
 
+    PWMOutputState(PWM_MOTOR_GENERATOR, PWM_PIN7_BIT, true);
 
     return 0;
 

@@ -1,27 +1,24 @@
 /*
  * analogueConverter.c
- * P.J. Bones   UCECE, J. Laws
- * Last modified: 8/Aug/2023
-*/
+ *
+ *  Created on: 8/08/2023
+ *      Authors: P.J. Bones UCECE, Tom Clifton, James Laws
+ */
+
 
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "driverlib/adc.h"
+#include "driverlib/sysctl.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
-#include "driverlib/adc.h"
-#include "driverlib/gpio.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/interrupt.h"
-#include "driverlib/debug.h"
-
-#include "drivers/ustdlib.h"
-#include "types/circBufT.h"
 
 #include "analogueConverter.h"
+#include "types/circBufT.h"
 
 // Buffer size
-#define BUF_SIZE 5
+#define BUF_SIZE 10
 
 // Buffer for storing conversion results
 static circBuf_t adcBuffer;
@@ -85,7 +82,7 @@ uint8_t initADC(void)
 * Calculates and return the rounded mean of the buffer contents
 */
 uint16_t getBufferMean(void){
-    uint32_t sum = 0;
+    uint16_t sum = 0;
     uint8_t i;
     for (i = 0; i < BUF_SIZE; i++)
         sum = sum + readCircBuf(&adcBuffer);

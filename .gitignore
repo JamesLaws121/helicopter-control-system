@@ -1,0 +1,11 @@
+.ccsproject
+.cproject
+.launches/
+.project
+.settings/
+FreeRTOS/
+Release/
+targetConfigs/
+tm4c1236h6pm.cmd
+tm4c1236h6pm_startup_ccs.c
+Debug/

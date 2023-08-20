@@ -1,7 +1,8 @@
 /*
  * heightController.h
- * James Laws
- * Last modified: 2/08/2023 
+ *
+ *  Created on: 2/08/2023
+ *  Authors: James Laws
  */
 
 #include "stdint.h"
@@ -10,9 +11,15 @@
 #define HEIGHTCONTROLLER_H_
 
 
+/**
+ * Initializes the Height controller
+ */
 uint8_t heightControllerInit(void);
 
 
+/**
+* Gets the calibration state queue
+**/
 QueueHandle_t getCalibrationQueue(void);
 
 

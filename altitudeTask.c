@@ -1,40 +1,34 @@
 /*
  * altitudeTask.c
- * James Laws
- * Last modified: 8/Aug/2023
+ *
+ *  Created on: 8/08/2023
+ *      Authors: James Laws, Tom Clifton
  */
-
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "FreeRTOS.h"
+
+#include "driverlib/adc.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
-#include "driverlib/gpio.h"
-#include "driverlib/rom.h"
-#include "driverlib/adc.h"
-
-#include "drivers/buttons.h"
-#include "drivers/uartstdio.h"
-
 
 #include "altitudeTask.h"
-#include "config.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
 #include "analogueConverter.h"
-
+#include "config.h"
+#include "drivers/uartstdio.h"
+#include "queue.h"
+#include "task.h"
 
 /**
-* The stack size for the buttons task
+* The stack size for the altitude input task
 **/
-#define ALTITUDE_TASK_STACK_SIZE    32         // Stack size in words
+#define ALTITUDE_TASK_STACK_SIZE    128         // Stack size in words
 
 /**
 * The number of samples to trigger before updating the controller
 **/
-#define SAMPLE_COUNT    5
+#define SAMPLE_COUNT    10
 
 
 /**
@@ -45,7 +39,7 @@
 
 
 /**
-* The queue that holds button inputs
+* The queue that holds altitude inputs
 **/
 QueueHandle_t altitudeInputQueue;
 
@@ -70,11 +64,7 @@ static void altitudeTask(void *pvParameters) {
     {
         vTaskDelay(pdMS_TO_TICKS(FREQUENCY_ALTITUDE_TASK));
 
-
         xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
-        //UARTprintf("\n\n Altitude Input Task");
-
-
 
         // Trigger the collection of altitude data
         ADCProcessorTrigger(ADC0_BASE, 3);
@@ -88,9 +78,7 @@ static void altitudeTask(void *pvParameters) {
             if(xQueueSendToBack(altitudeInputQueue, &sampleAverage , 2) != pdPASS) {
                 UARTprintf("\nERROR: Queue full. This should never happen.\n");
             }
-            uint16_t ulValReceived = 0;
-            xQueuePeek( altitudeInputQueue, &ulValReceived, 0 );
-            UARTprintf("\n\nItem sent %d", ulValReceived);
+
         }
         xSemaphoreGive(UARTSemaphore);
         

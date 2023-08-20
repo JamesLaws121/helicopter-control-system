@@ -1,5 +1,5 @@
 /*
- * HeightController.c
+ * heightController.c
  *
  *  Created on: 2/08/2023
  *      Author: James Laws, Ben
@@ -7,23 +7,18 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "driverlib/gpio.h"
-#include "driverlib/rom.h"
-
-#include "drivers/buttons.h"
-#include "drivers/uartstdio.h"
 #include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
+#include "inc/hw_memmap.h"
 
-#include "config.h"
+#include "altitudeTask.h"
 #include "buttonTask.h"
+#include "config.h"
+#include "drivers/uartstdio.h"
 #include "heightOutputTask.h"
 #include "heightController.h"
-#include "altitudeTask.h"
+#include "queue.h"
+#include "semphr.h"
+#include "task.h"
 
  /**
  *The item size and queue size for the calibration queue.
@@ -33,13 +28,23 @@
 
 #define MAX_HEIGHT 1300
 
+#define MAX_HEIGHT 1300
+
 /**
 * The stack size for the buttons task
 **/
 #define HEIGHT_TASK_STACK_SIZE    128         // Stack size in words
 
+
+/**
+* The queue that holds the calibration state
+**/
 QueueHandle_t calibrationQueue;
 
+
+/**
+* Gets the calibration state queue
+**/
 QueueHandle_t getCalibrationQueue(void) {
     return calibrationQueue;
 }
@@ -53,60 +58,79 @@ static void heightControllerTask(void *pvParameters) {
     * This is the current height set by the user
     **/
 
+    uint8_t changeInState = 1;
+    uint16_t newHeight = 0;
+
     uint8_t buttonInputMessage;
     uint16_t altitudeInputMessage;
 
-    HeightStructure_t heightOutputMessage;
-    heightOutputMessage.currentHeight = 0;
-    heightOutputMessage.desiredHeight = 0;
+    HeightStructure_t heightStatus;
+    heightStatus.currentHeight = 0;
+    heightStatus.desiredHeight = 0;
 
 
-    int32_t groundVoltage = -1;
+    uint32_t groundVoltage = 0;
+
+    uint8_t calibrationCountdown = 4;
 
     while(1)
     {
         vTaskDelay(pdMS_TO_TICKS(FREQUENCY_HEIGHT_CONTROLLER_TASK));
         xSemaphoreTake(UARTSemaphore, portMAX_DELAY);
 
-        UARTprintf("\n\nHeight Controller Task");
 
-
-        // Read the next button input, if available on queue.
+        // Read and adjust height based on all button inputs, if any available on queue.
         QueueHandle_t buttonInputQueue = getButtonInputQueue();
-        if(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
-            // Update height based on button buttonInput
-            UARTprintf("\n BUTTON: %d", buttonInputMessage); //16 for left, 1 for right
-
+        while(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
             heightOutputMessage.desiredHeight = calculateNewHeight(heightOutputMessage.currentHeight, buttonInputMessage);
-
         }
 
         // Reads the altitude input and updates output accordingly
         QueueHandle_t altitudeInputQueue = getAltitudeInputQueue();
 
         if (xQueueReceive(altitudeInputQueue, &altitudeInputMessage, 0) == pdPASS) {
-            // Calculate roter output to get to wanted altitude
-            UARTprintf("\n READ FROM ALTITUDE QUEUE\n RESULT: %d",altitudeInputMessage);
 
             // Calibrate ground voltage
-            if (groundVoltage == -1) {
-                UARTprintf("\n Setting ground voltage.\n");
-                groundVoltage = altitudeInputMessage;
+            if (calibrationCountdown != 0) {
+                calibrationCountdown -= 1;
+                UARTprintf("\n Calibrating \n");
 
-                uint8_t calibrationMessage = 1;
-                if(xQueueSendToBack(calibrationQueue, &calibrationMessage , 5) != pdPASS) {
-                    UARTprintf("\nERROR: calibration queue full. This should never happen.\n");
+                if (calibrationCountdown != 3) {
+                    groundVoltage = groundVoltage==0? altitudeInputMessage: (groundVoltage + altitudeInputMessage)/2;
+                }
+
+                if (calibrationCountdown == 0) {
+                    UARTprintf("\n Calibrating Finished \n");
+
+                    uint8_t calibrationMessage = 1;
+                    xQueueOverwrite(calibrationQueue, &calibrationMessage);
                 }
             } else {
-                heightOutputMessage.currentHeight = altitudeInputMessage - groundVoltage;
-                // Write to output queue
-                UARTprintf("\n Send data to height output\n");
-                QueueHandle_t heightOutputQueue = getHeightOutputQueue();
-                if(xQueueSendToBack(heightOutputQueue, &heightOutputMessage, 5) != pdPASS) {
-                    UARTprintf("\nERROR: height output queue full. This should never happen.\n");
+                // Calculate current height
+                newHeight = (altitudeInputMessage > groundVoltage) ? 0 : groundVoltage - altitudeInputMessage;
+                if (heightStatus.currentHeight != newHeight) {
+                    // Used to tell if the height has changed
+                    changeInState = 1;
+                    heightStatus.currentHeight = newHeight;
                 }
+
+                // Write to output queue
+                QueueHandle_t heightOutputQueue = getHeightOutputQueue();
+                xQueueOverwrite(heightOutputQueue, &heightStatus);
             }
 
+        }
+
+
+        /**
+         * Displays current height and altitude data to the user
+         */
+        if (changeInState == 1 && calibrationCountdown == 0) {
+            changeInState = 0;
+            UARTprintf("\n CURRENT HEIGHT: %d mv",heightStatus.currentHeight);
+            UARTprintf("\n DESIRED HEIGHT: %d mv",heightStatus.desiredHeight);
+            UARTprintf("\n CURRENT HEIGHT PERCENTAGE: %d %%",(heightStatus.currentHeight)/(MAX_HEIGHT/100));
+            UARTprintf("\n DESIRED HEIGHT PERCENTAGE: %d %% \n",(heightStatus.desiredHeight)/(MAX_HEIGHT/100));
         }
 
         xSemaphoreGive(UARTSemaphore);
@@ -124,12 +148,12 @@ uint8_t heightControllerInit(void) {
     calibrationQueue = xQueueCreate(CALIBRATION_QUEUE_SIZE, CALIBRATION_ITEM_SIZE);
 
     /*
-    * Create the buttons task.
+    * Create the height controller task.
     */
     if(pdTRUE !=  xTaskCreate(heightControllerTask, "heightControllerTask", HEIGHT_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY +
                    PRIORITY_HEIGHT_CONTROLLER_TASK, NULL))
     {
-        return(1); // error creating task, out of memory?
+        return 1; // error creating task, out of memory?
     }
 
     return 0;

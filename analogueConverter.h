@@ -1,8 +1,9 @@
 /*
- * analogueConverter.c
- * P.J. Bones UCECE, James Laws
- * Last modified: 8/Aug/2023
-*/
+ * analogueConverter.h
+ *
+ *  Created on: 8/08/2023
+ *      Authors: P.J. Bones UCECE, Tom Clifton, James Laws
+ */
 
 #include <stdint.h>
 
