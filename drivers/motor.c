@@ -118,10 +118,6 @@ PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integrat
 
     heightData.integratedHeightError = integratedHeightError + heightError * DELTA_T;            // Integral Height Error
 
-     // Recored previous height error for the integral error
-     // previousHeightError = heightError;
-
-
     // Calculation of the main rotor's duty cycle
     int32_t mainDuty = MOTOR_CONSTANT + kpHeight * heightError + kiHeight * heightData.integratedHeightError;
 
