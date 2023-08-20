@@ -26,14 +26,15 @@
 #define CALIBRATION_ITEM_SIZE           sizeof(uint8_t)
 #define CALIBRATION_QUEUE_SIZE          1
 
-#define MAX_HEIGHT 1300
-
+ /**
+ *The max altitude value
+ **/
 #define MAX_HEIGHT 1300
 
 /**
 * The stack size for the buttons task
 **/
-#define HEIGHT_TASK_STACK_SIZE    128         // Stack size in words
+#define HEIGHT_TASK_STACK_SIZE    256         // Stack size in words
 
 
 /**
@@ -82,7 +83,7 @@ static void heightControllerTask(void *pvParameters) {
         // Read and adjust height based on all button inputs, if any available on queue.
         QueueHandle_t buttonInputQueue = getButtonInputQueue();
         while(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
-            heightOutputMessage.desiredHeight = calculateNewHeight(heightOutputMessage.currentHeight, buttonInputMessage);
+            heightStatus.desiredHeight = calculateNewHeight(heightStatus.desiredHeight, buttonInputMessage);
         }
 
         // Reads the altitude input and updates output accordingly
@@ -159,23 +160,25 @@ uint8_t heightControllerInit(void) {
     return 0;
 }
 
-int calculateNewHeight(int currentHeight, uint8_t buttonInputMessage) {
-    /*
-     * Calculate height from button input
-     */
-    if (buttonInputMessage == 16 && currentHeight >= MAX_HEIGHT/10 && currentHeight <= MAX_HEIGHT) {
-        return currentHeight - MAX_HEIGHT/10;
-    } else if (buttonInputMessage == 1 && currentHeight >= 0 && currentHeight <= (MAX_HEIGHT - MAX_HEIGHT/10)) {
-        return currentHeight + MAX_HEIGHT/10;
+/*
+ * Calculate height from button input
+ */
+uint16_t calculateNewHeight(uint16_t currentHeight, uint8_t buttonInputMessage) {
+
+    if (buttonInputMessage == 16 && currentHeight >= (MAX_HEIGHT/10) && currentHeight <= MAX_HEIGHT) {
+        return currentHeight - (MAX_HEIGHT/10);
+    } else if (buttonInputMessage == 1 && currentHeight <= (MAX_HEIGHT - (MAX_HEIGHT/10))) {
+        return currentHeight + (MAX_HEIGHT/10);
     } else {
         return currentHeight;
     }
 }
 
+/*
+ * Black box testing new height calculation
+ */
 void calculateNewHeightTest(uint16_t currentHeight) {
-    /*
-     * Black box testing new height calculation
-     */
+
 
     //16 for left, 1 for right
     UARTprintf("\n\n--------------\n");
@@ -192,6 +195,8 @@ void calculateNewHeightTest(uint16_t currentHeight) {
     //Invalid height numbers
     UARTprintf("Test 5 result, %s\n", calculateNewHeight(5, 16) == 5 ? "PASS" : "FAIL");
     UARTprintf("Test 6 result, %s\n", calculateNewHeight(1290, 1) == 1290 ? "PASS" : "FAIL");
-    UARTprintf("Test 7 result, %s\n", calculateNewHeight(-500, 16) == -500 ? "PASS" : "FAIL");
-    UARTprintf("Test 8 result, %s\n", calculateNewHeight(-5, 1) == -5 ? "PASS" : "FAIL");
+
+    //Exact test
+    UARTprintf("Test 7 result, %s\n", calculateNewHeight(0, 1) == 130 ? "PASS" : "FAIL"); //Will
+    UARTprintf("Test 8 result, %s\n", calculateNewHeight(130, 1) == 260 ? "PASS" : "FAIL"); //Will
 }
