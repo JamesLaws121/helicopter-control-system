@@ -5,6 +5,7 @@
  *      Authors: Benjamin Stewart, James Laws
  */
 
+#include "FreeRTOS.h"
 #include "queue.h"
 
 #ifndef BUTTTONTASK_H_

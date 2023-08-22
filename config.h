@@ -19,7 +19,7 @@
 #define PRIORITY_BUTTON_TASK                1
 #define PRIORITY_HEIGHT_CONTROLLER_TASK     2
 #define PRIORITY_ALTITUDE_TASK              3
-#define PRIORITY_HEIGHT_OUTPUT_TASK         4
+#define PRIORITY_ALTITUDE_OUTPUT_TASK       4
 
 
 /*  The frequencies of the various tasks.
@@ -29,7 +29,7 @@
 #define FREQUENCY_BUTTON_TASK               23
 #define FREQUENCY_HEIGHT_CONTROLLER_TASK    29
 #define FREQUENCY_ALTITUDE_TASK             37
-#define FREQUENCYY_HEIGHT_OUTPUT_TASK       43
+#define FREQUENCYY_ALTITUDE_OUTPUT_TASK       43
 #define CALIBRATION_FREQUENCY               241
 
 

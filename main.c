@@ -18,8 +18,8 @@
 #include "queue.h"
 #include "semphr.h"
 
+#include "altitudeOutputTask.h"
 #include "buttonTask.h"
-#include "heightOutputTask.h"
 #include "altitudeTask.h"
 #include "heightController.h"
 #include "uartSetup.h"
@@ -84,9 +84,9 @@ int main(void)
     }
 
     /*
-    * Create the heightOuput task
+    * Create the altitudeOuput task
     */
-    if(heightOutputTaskInit() != 0)
+    if(altitudeOutputTaskInit() != 0)
     {
         // Error while creating task
         while(1)

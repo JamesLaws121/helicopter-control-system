@@ -5,16 +5,17 @@
  *      Author: James Laws, Ben
  */
 
+
 #include <stdbool.h>
 #include <stdint.h>
 #include "FreeRTOS.h"
 #include "inc/hw_memmap.h"
 
+#include "altitudeOutputTask.h"
 #include "altitudeTask.h"
 #include "buttonTask.h"
 #include "config.h"
 #include "drivers/uartstdio.h"
-#include "heightOutputTask.h"
 #include "heightController.h"
 #include "queue.h"
 #include "semphr.h"
@@ -116,8 +117,8 @@ static void heightControllerTask(void *pvParameters) {
                 }
 
                 // Write to output queue
-                QueueHandle_t heightOutputQueue = getHeightOutputQueue();
-                xQueueOverwrite(heightOutputQueue, &heightStatus);
+                QueueHandle_t altitudeOutputQueue = getAltitudeOutputQueue();
+                xQueueOverwrite(altitudeOutputQueue, &heightStatus);
             }
 
         }
