@@ -85,6 +85,7 @@ static void heightControllerTask(void *pvParameters) {
         QueueHandle_t buttonInputQueue = getButtonInputQueue();
         while(xQueueReceive(buttonInputQueue, &buttonInputMessage, 0) == pdPASS) {
             heightStatus.desiredHeight = calculateNewHeight(heightStatus.desiredHeight, buttonInputMessage);
+            changeInState = 1;
         }
 
         // Reads the altitude input and updates output accordingly
