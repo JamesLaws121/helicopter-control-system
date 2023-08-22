@@ -14,8 +14,9 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
-#include "analogueConverter.h"
 #include "types/circBufT.h"
+#include "analogueConverter.h"
+
 
 // Buffer size
 #define BUF_SIZE 10
@@ -86,7 +87,6 @@ uint16_t getBufferMean(void){
     uint8_t i;
     for (i = 0; i < BUF_SIZE; i++)
         sum = sum + readCircBuf(&adcBuffer);
-        
 
     return ((2 * sum + BUF_SIZE) / 2 / BUF_SIZE);
 }

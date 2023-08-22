@@ -11,8 +11,6 @@
 
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
-
-
 #include "driverlib/debug.h"
 #include "driverlib/systick.h"
 #include "driverlib/gpio.h"
@@ -22,16 +20,16 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
 
-#include "drivers/buttons.h"
-#include "drivers/motor.h"
-#include "drivers/uartstdio.h"
-
 #include "FreeRTOS.h"
 #include "timers.h"
 #include "config.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
+
+#include "drivers/buttons.h"
+#include "drivers/motor.h"
+#include "drivers/uartstdio.h"
 
 #include "heightController.h"
 
@@ -50,22 +48,20 @@
 #define GPIO_PWM_CONFIG             GPIO_PC5_M0PWM7
 #define GPIO_PWM_MOTOR_PIN          GPIO_PIN_5
 #define PDMS_TO_TICKS               20
-#define PERCENT                     100
-#define DELTA_T                     0.1 // Used for calculating the integrated height error
-#define PWM_DIVIDER                 4
+
 
 /**
  *  PWM configurations
  */
 #define PWM_DUTY_FIXED              67
-
 #define MAX_PWM                     85
 #define MIN_PWM                     15
 #define MOTOR_CONSTANT              30
 #define MOTOR_KP                    1.5
 #define MOTOR_KI                    0.0065
-
-
+#define DELTA_T                     0.1 // Used for calculating the integrated height error
+#define PERCENT                     100
+#define PWM_DIVIDER                 4
 #define MAX_ERROR                   20
 #define MIN_ERROR                  -20
 
@@ -89,13 +85,13 @@ void setPWM(uint32_t ui32Freq, uint32_t ui32Duty)
 
 
 /*
-* Calculates the duty for the motor. Uses the AltitudeTask
-* to find the current height and the desired height
+* Calculates the duty for the motor.
+* Takes current height and the desired height
 */
 PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integratedHeightError )
 {
     PWMStructure_t heightData;
-    double heightError;                           // The altitude error
+    double heightError;
 
     // The PI controller gains for the main rotor
     double kpHeight = MOTOR_KP;                         // Proportional Gain
@@ -149,9 +145,6 @@ PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integrat
  */
 uint8_t motorInit(void)
 {
-   // SysCtlPeripheralReset (PWM_PERIPH_GPIO); // Used for PWM output
-    //SysCtlPeripheralReset (PWM_PERIPH_PWM);  // Main Rotor PWM
-
     SysCtlPeripheralEnable(PWM_PERIPH_PWM);
     SysCtlPeripheralEnable(PWM_PERIPH_GPIO);
 
@@ -160,8 +153,8 @@ uint8_t motorInit(void)
 
     PWMGenConfigure(PWM_MOTOR_GENERATOR, PWM_MAIN_GEN, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
 
+
     // Initialize parameters for PWM
-    //setPWM(INITIAL_PWM_FREQ, PWM_DUTY_FIXED);
     PWMGenEnable(PWM_MOTOR_GENERATOR, PWM_MAIN_GEN);
 
     PWMOutputState(PWM_MOTOR_GENERATOR, PWM_PIN7_BIT, false);
@@ -171,6 +164,5 @@ uint8_t motorInit(void)
     PWMOutputState(PWM_MOTOR_GENERATOR, PWM_PIN7_BIT, true);
 
     return 0;
-
 }
 

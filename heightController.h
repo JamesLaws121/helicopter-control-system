@@ -6,6 +6,8 @@
  */
 
 #include "stdint.h"
+#include "FreeRTOS.h"
+#include "queue.h"
 
 #ifndef HEIGHTCONTROLLER_H_
 #define HEIGHTCONTROLLER_H_

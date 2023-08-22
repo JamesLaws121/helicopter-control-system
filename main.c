@@ -18,6 +18,7 @@
 #include "queue.h"
 #include "semphr.h"
 
+#include "test/heightControllerTests.h"
 #include "altitudeOutputTask.h"
 #include "buttonTask.h"
 #include "altitudeTask.h"

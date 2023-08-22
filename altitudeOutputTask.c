@@ -36,11 +36,11 @@
 #define ALTITUDE_OUTPUT_ITEM_SIZE       sizeof(HeightStructure_t)
 #define ALTITUDE_OUTPUT_QUEUE_SIZE      1
 
+
 /**
 * The queue that holds altitude outputs
 **/
 QueueHandle_t altitudeOutputQueue;
-
 
 
 /**

@@ -7,18 +7,20 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "FreeRTOS.h"
-
 #include "driverlib/adc.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "task.h"
+
+#include "drivers/uartstdio.h"
 #include "altitudeTask.h"
 #include "analogueConverter.h"
 #include "config.h"
-#include "drivers/uartstdio.h"
-#include "queue.h"
-#include "task.h"
+
+
 
 /**
 * The stack size for the altitude input task

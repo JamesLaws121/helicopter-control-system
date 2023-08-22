@@ -5,36 +5,18 @@
  *  Authors: AJ Seville, James Laaws , Thomas Clifton
  */
 
-#include <stdbool.h>
+
 #include <stdint.h>
-
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "driverlib/gpio.h"
-#include "driverlib/rom.h"
-#include "driverlib/pwm.h"
-#include "driverlib/interrupt.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/sysctl.h"
-#include "drivers/buttons.h"
-#include "drivers/uartstdio.h"
-
 #include "FreeRTOS.h"
-#include "timers.h"
-#include "config.h"
-#include "task.h"
 #include "queue.h"
-#include "semphr.h"
 #include "heightController.h"
+
 
 #define INITIAL_PWM_FREQ    250
 
 
 #ifndef DRIVERS_MOTOR_H_
 #define DRIVERS_MOTOR_H_
-
-
-TimerHandle_t PWMTimer;
 
 
 /*
@@ -54,8 +36,8 @@ void setPWM(uint32_t ui32Freq, uint32_t ui32Duty);
 
 
 /*
-* Calculates the duty for the motor. Uses the AltitudeTask
-* to find the current height and the desired height
+* Calculates the duty for the motor.
+* Takes current height and the desired height
 */
 PWMStructure_t calculateMotorDuty(HeightStructure_t heightInput, double integratedHeightError);
 
