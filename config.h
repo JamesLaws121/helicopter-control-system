@@ -16,10 +16,10 @@
 
 // The priorities of the various tasks.
 
-#define PRIORITY_BUTTON_TASK                1
-#define PRIORITY_HEIGHT_CONTROLLER_TASK     2
-#define PRIORITY_ALTITUDE_TASK              3
-#define PRIORITY_ALTITUDE_OUTPUT_TASK       4
+#define PRIORITY_BUTTON_TASK                4
+#define PRIORITY_HEIGHT_CONTROLLER_TASK     3
+#define PRIORITY_ALTITUDE_TASK              2
+#define PRIORITY_ALTITUDE_OUTPUT_TASK       1
 
 
 /*  The frequencies of the various tasks.
