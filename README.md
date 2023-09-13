@@ -10,4 +10,4 @@
 
 ## Description
 Real-time control software to run on a Tiva microcontroller (MCU), to interact and control a supplied helicopter emulator program running on a separate
-microcontroller.
+microcontroller. Programmed in C and uses FreeRTOS for task scheduling.
