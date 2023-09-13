@@ -1,4 +1,4 @@
-# ENCE464 real time helicoptor control system
+# ENCE464 real time helicopter control system
 
 
 
